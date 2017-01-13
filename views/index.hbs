@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<!-- TODO: Timer on flip cards -->
+<html lang="en">
+  <head>
+    <title>Inquizica: the intuitive learning platform</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="Distributed Practice Testing platform and analytics." />
+    <meta name="keywords" content="education, learning" />
+    <meta name="author" content="Sean Lynch" />
+    <link rel="icon" type="image/png" href="/public/img/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/public/img/favicon-16x16.png" sizes="16x16">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <script src="https://npmcdn.com/jquery@3.1.0/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.4/semantic.min.css" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.4/semantic.min.js"></script>
+
+    <script type="text/javascript" src="../public/javascripts/bodymovin.js"></script>
+    <link rel="stylesheet" href="../public/css/menu_masthead_hero.css" />
+    <script type="text/javascript" src="../public/javascripts/menu_masthead.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans|Oswald:300|Bitter|Roboto|Raleway:500, 400i" rel="stylesheet">
+    <style>
+      .masthead {
+        width: 100%;
+        background-image: url('../public/img/bg_pattern_01.png') !important;
+        background-size: cover !important;
+        background-position: center center;
+        background-repeat: no-repeat;
+        /*background: #006B94 !important;*/
+      }
+      #logo {
+        font-family: 'Bitter', serif;
+        font-size: 1.65em;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
+      #big_logo {
+        font-family: 'Bitter', serif;
+        font-size: 3.5em;
+        padding-top: 5px;
+        padding-bottom: 10px;
+      }
+
+      p {
+        font-family: 'Roboto', sans-serif;
+      }
+      .ui.green.card {
+        background: #f7f7f7;
+      }
+
+      .feature_header {
+        font-family: 'Oswald', sans-serif !important;
+        font-size: 2.5em !important;
+        margin-top: 0 !important;
+        color: white !important;
+      }
+
+      .content p {
+        font-family: 'Roboto', sans-serif !important;
+        font-size: 1.25em !important;
+        line-height: normal !important;
+        color: #e0e0e0 !important;
+        opacity: 0.8 !important;
+      }
+
+      .para {
+        width: 500px;
+      }
+
+    </style>
+
+  </head>
+  <body>
+    {{> navMenu }}
+
+    <!-- Page Contents -->
+    <div class="pusher">
+
+      <!-- Menu, Hero & Such -->
+      <div class="ui inverted vertical masthead center aligned segment">
+
+        <!-- Main Header Menu -->
+        <div class="ui container">
+          <div class="ui large secondary inverted pointing menu">
+            <!-- <div class="item">
+              <img src="/public/img/favicon.png">
+            </div> -->
+            <div id="logo" class="header item">Inquizica</div>
+            <a class="toc item">
+              <i class="sidebar icon"></i>
+            </a>
+            <!-- {{#if user}}
+              <a href="/courses" class="item">Courses</a>
+            {{else}}
+              <a href="/login?redirectmsg=But please sign in to see our courses&redirectheader=We can see your eager to get started!" class="item">Courses</a>
+            {{/if}}
+            <a href="/about" class="item">About</a> -->
+            <div class="right item">
+              {{#if user}}
+                <a href="/account" class="ui inverted button">Account</a>
+                <!-- <a href="/courses" class="ui inverted button">Courses</a> -->
+                <a href="/logout" class="ui inverted red button">Log out</a>
+              {{else}}
+                <a href="/signup" class="ui inverted button">Sign up</a>
+                <a href="/login" class="ui inverted button">Log in</a>
+                <!-- <a href="#about" class="ui inverted button">About</a> -->
+              {{/if}}
+            </div>
+          </div>
+        </div>
+
+        <!-- Error/Redirect Message  -->
+        <div id="redirect-msg" class="ui floating compact warning message" style="display:none; width:400px !important; position:absolute; margin-left: -200px; left: 50%; top: 3em; z-index:10; ">
+          <i class="close icon"></i>
+          <div class="header h"></div>
+          <p class="b"></p>
+        </div>
+
+        <!-- Hero & Such -->
+        <div style="margin-top: 6em;" class="ui container">
+          <div class="ui stackable grid">
+
+            <!-- Image -->
+            <div class="eight wide column svg_container">
+              <div class="ui container">
+                <div style="z-index:100; width:100%; height:100%;" id="bodymovin"></div>
+              </div>
+            </div>
+
+            <!-- Text -->
+            <div class="eight wide column">
+
+                <!-- Header -->
+                <h1 style="font-family: 'Jose Sans', sans-serif; font-size: 3em !important; margin-top: 1.5em !important;" class="ui inverted header right_header">
+                  Learning made for {{#if user}}{{user.name}}{{else}}you{{/if}}
+                </h1>
+                <h2 style="font-family: 'Raleway', sans-serif; font-style: italic; width: 80%; margin: 0.5em auto; color: #d2d2d2; opacity: 0.8;">
+                  High impact quizzes, straight to your phone, at optimized intervals.
+                </h2>
+                {{#if user}}
+                {{else}}
+
+                <!-- Free Trial -->
+                <div style="padding-top: 1em;" id="free_trial" class="ui left labeled right action input">
+                  <div style="color: #d2d2d2;" class="ui dropdown label">
+                    <div style="color: #a0a0a0;" class="text">Try it now</div>
+                    <i class="dropdown icon"></i>
+                    <div class="trial menu">
+                      <div class="item" value="90210">A.N.S.</div>
+                    </div>
+                  </div>
+                  <input class="trial_number" placeholder="Phone Number" type="text" />
+                  <a class="ui orange button start_trial">Send</a>
+                </div>
+                <br />
+                <br />
+
+                <!-- Big Buttons! -->
+                <!-- <a href='#about' class="ui huge inverted button learn_more">Learn More</a>
+                <a href='/signup' class="ui huge orange button">Get Started <i class="right arrow icon"></i></a href='/signup'> -->
+                {{/if}}
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
+      <!-- Features -->
+      <div id="about" style="border: none; padding-top: 1em; background: #006B94;" class="ui vertical stripe segment">
+        <h1 style="font-family: 'Oswald', sans-serif; color: #f8f8f8; font-size: 4em; margin-top: 0.4em; margin-bottom: 0.75em;" class="ui center aligned header">Features<div style="font-family: 'Raleway', sans-serif; font-style: italic; color: #e0e0e0;" class="sub header"> for stress-free, efficient learning.</div></h1>
+        <br />
+        <div class="ui middle aligned stackable grid container">
+          <div class="four wide column">
+            <!-- <div class='ui orange card'>
+              <div class='content'>
+                <div class='header'><i class="refresh icon"></i>Learning</div>
+                <div class='meta'>Acquire and retrieve</div>
+                <div class='description'>
+                  <p>Learning isn't just about going to class or studying. Consistant practice plays a crucial role as well.</p>
+                </div>
+              </div>
+            </div> -->
+            <div class="ui center aligned basic segment">
+              <img src="./public/img/feature_icon_1.png" />
+              <br />
+              <h2 class="ui icon header feature_header">Learning</h2>
+              <div class='content'>
+                <p>
+                  Learning occurs through instruction and practice retrieval; while schools cover instruction, we specialize in retrieval.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class=" four wide column">
+            <div class="ui center aligned basic segment">
+              <img src="./public/img/feature_icon_3.png" />
+              <br />
+              <h2 class="ui icon header feature_header">Practice</h2>
+              <div class='content'>
+                <p>
+                  Practice testing is the best form of retrieval; our practice quizzes reinforce problem solving skills and promote abstract reasoning.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class=" four wide column">
+            <div class="ui center aligned basic segment">
+              <img src="./public/img/feature_icon_2.png" />
+              <br />
+              <h2 class="ui icon header feature_header">Intervals</h2>
+              <div class='content'>
+                <p>
+                   Spacing out practice testing over time stops cramming and saves time; our spacing algorithm and notification system makes it simple.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class=" four wide column">
+            <div class="ui center aligned basic segment">
+              <img src="./public/img/feature_icon_4.png" />
+              <br />
+              <h2 class="ui icon header feature_header">Improve</h2>
+              <div class='content'>
+                <p>
+                  Learning through spaced practice testing improves long-term retention and grades; we make it easy to do better in school and at work.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- How It Works -->
+      <div style="border: none; background: linear-gradient(to bottom, #006B94, #003152 98%); padding-top: 3em; " class="ui vertical stripe segment">
+        <h1 style="font-family: 'Oswald', sans-serif; color: #f8f8f8; font-size: 4em; margin-top: 0.4em; margin-bottom: 0.75em;" class="ui center aligned header">How Inquizica Works</h1>
+
+        <br />
+
+        <div style="color: white" class="ui middle aligned stackable grid container">
+          <div class="row">
+
+            <div style="text-align: right;" class="six wide column">
+              <a class="ui image">
+                <img src="../public/img/process_story_01.png" width="250px">
+              </a>
+            </div>
+            <div class="ten wide column">
+              <h3 style="margin-top: 0;" class="ui header feature_header">Learn by Smartphone</h3>
+              <div class="content">
+                <p class="para">Practice quiz notifications are sent to your smartphone throughout the day. Quizzes match in-class content and are perfectly timed with your exam schedule.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="ten wide column">
+              <h3 style="margin-top: 0; text-align:right;" class="ui header feature_header">Fast and Easy</h3>
+              <div class="content">
+                <p class='para' style="text-align:right; float: right;">Each practice quiz consists of four to six multiple choice questions, focuses on a single topic, and takes only a few minutes to complete.  Our questions range in difficulty to help learn more and better prepare for in class exams. </p>
+              </div>
+            </div>
+            <div class="six wide column">
+              <a class="ui left floated image">
+                <img src="../public/img/process_story_02.png" width="250px">
+              </a>
+            </div>
+          </div>
+
+          <div class="row">
+            <div style="text-align:right;" class="six wide column">
+              <a class="ui image">
+                <img src="../public/img/process_story_03.png" width="250px">
+              </a>
+            </div>
+            <div class="ten wide column">
+              <h3 style="margin-top: 0;" class="ui header feature_header">More Free Time</h3>
+              <div class="content">
+                <p class='para'>Our spacing algorithm ensures you cover every topic more than once, while our analytics lets you know how well you’re doing and what you should focus on; both of which save you time and provide peace of mind.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div style="text-align:right;" class="ten wide column">
+              <h3 style="margin-top: 0;"  class="ui header feature_header">Reap the Rewards</h3>
+              <div class="content">
+                <p class='para' style="float: right;">Follow the quizzing schedule and see the benefits; remember more, do better in class or at work and no more cramming. </p>
+              </div>
+            </div>
+            <div class="six wide column">
+              <a class="ui left floated image">
+                <img src="../public/img/process_story_04.png" width="250px">
+              </a>
+            </div>
+          </div>
+
+          <!-- <div class="row">
+            <a style="margin: 0 auto;" href='/signup' class="ui huge orange button">Get Started <i class="right arrow icon"></i></a href='/signup'>
+          </div> -->
+
+        </div>
+      </div>
+
+      <!-- Testimonials -->
+      <!-- <div style="border: none; background-color:#006B94;" class="ui vertical stripe quote segment">
+        <h1 style="font-family: 'Roboto', sans-serif; font-size: 3em; padding-top: 1em;" class="ui center aligned header">Join the Movement<div class="sub header">Hear what others have to say about us.</div></h1>
+        <br />
+        <div class="ui equal width stackable internally celled grid">
+          <div class="center aligned row">
+            <div style="box-shadow: none; opacity: 0.8;" class="green column">
+              <h3>"I spend less time studying and get higher grades. It's like magic!"</h3>
+              <p>- Some User</p>
+            </div>
+            <div style="box-shadow: none; opacity: 0.8;" class="blue column">
+              <h3>"I can't believe I didn't start using Inquizica sooner."</h3>
+              <p>- Another User</p>
+            </div>
+          </div>
+        </div>
+      </div> -->
+
+      <!-- News -->
+      <!-- <div style="border: none; background-color:#003152; padding-top: 3em;" class="ui vertical stripe segment">
+        <div class="ui text container">
+          <h1 style="margin: 1em 0em 2em; color: white; font-family: 'Jose Sans', sans-serif;" class="ui horizontal header divider">News</h1>
+          <h3 style="margin-top: 1em;" class="ui header feature_header">Inquizica Launches!</h3>
+          <div style="padding-bottom: 1em;" class='content'>
+            <p>Hooray! Inquizica is finally online. This means that anybody can come and sign up. We'll let you know once the first course opens up.</p>
+          </div>
+
+          <br />
+
+          <h3 style="margin-top: 1em;" class="ui header feature_header">Check out the research</h3>
+          <div style="padding-bottom: 1em;" class='content'>
+            <p>Here are some of the links we found about learning and education. </p>
+          </div>
+          <a href="#" style="background-color: #38b549;" class="ui small button">Link1</a>
+          <a href="#" style="background-color: #38b549;" class="ui small button">Link2</a>
+
+          <br />
+          <br />
+
+          <h3 style="margin-top: 1em;" class="ui header feature_header">Give us your feedback!</h3>
+          <div style="padding-bottom: 1em;" class='content'>
+            <p>We really, really like hearing from you. Seriously, it makes our days so much better. Please fill out the survey below!</p>
+          </div>
+          <a href="#" style="background-color: #38b549;" class="ui small button">Survey</a>
+        </div>
+      </div> -->
+
+
+      {{> footer}}
+    </div>
+  <script src="../public/javascripts/redirectmsg.js"></script>
+  <script>
+
+    $(function () {
+      $('.ui.dropdown').dropdown();
+
+      $('.start_trial').on('click', function (e) {
+        e.preventDefault();
+        var regEx = /\d{10}/;
+        var courseCode = $('.trial .selected').attr('value');
+        var phoneNumber = $('.trial_number').val();
+        var validPhoneNum = regEx.test(phoneNumber) && (regEx.exec(phoneNumber) !== null) && (phoneNumber.length == 10);
+        if (typeof courseCode == 'undefined') {
+          // Bad choice of course
+          alert("Please select a sample course.");
+        } else if (!validPhoneNum) {
+          // Bad Phone Number
+          alert("Please use just the ten digits. No spaces, dashes or other characters.");
+        } else {
+          // All good to send.
+          var pack = {
+            course: courseCode,
+            phone: regEx.exec(phoneNumber)[0]
+          };
+          $.post("/promo", pack, function (res) {
+            window.location.href = '/?redirectheader=Success!&redirectmsg=Thanks%20for%20trying%20out%20Inquizica!';
+            console.log(res);
+          });
+        }
+      });
+
+      // If on mobile....
+      if (window.matchMedia( "(max-width: 767px)" ).matches) {
+        $('.svg_container').html('<div id="big_logo">Inquizica</div>');
+        $('.right_header').css('font-size', "2.25em");
+        $('.trial_number').css('width', '150px');
+        $('.ten.wide.column .content p').removeClass('para');
+      } else {
+        // SVG stuff
+        $.getJSON('/public/svg/fpa3.json', function (data) {
+          var bm = bodymovin.loadAnimation({
+            container: document.getElementById('bodymovin'), // the dom element
+            renderer: 'svg',
+            loop: false,
+            autoplay: true,
+            animationData: data // the animation data
+          });
+        });
+      }
+    });
+  </script>
+  </body>
+</html>

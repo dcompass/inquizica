@@ -1,0 +1,64 @@
+var knex = require('../knex.js');
+
+function Users() {
+  return knex('user');
+}
+
+// TODO: Reject bad user_objects.
+function create(user_obj) {
+  if (user_obj.hasOwnProperty('phone')) {
+    return Users().insert(user_obj);
+  } else {
+    return Promise.reject("Could not create new user.");
+  }
+}
+
+function read(user_id) {
+  return Users().select().where({
+    id: user_id
+  });
+}
+
+function update(user_id, user_data) {
+  return Users().where({
+    id: user_id
+  }).update(user_data);
+}
+
+function destroy(user_id) {
+  return Users().where({
+    id: user_id
+  }).del();
+}
+
+function getProgression(user_id, course_id) {
+  return knex('user_course').select('progression').where({
+    user_id: user_id,
+    course_id: course_id
+  });
+}
+
+function updateProgression(user_id, course_id, progression) {
+  return knex('user_course').where({
+    user_id: user_id,
+    course_id: course_id
+  }).update({
+    progression: progression
+  });
+}
+
+function getCourses(user_id) {
+  return knex('user_course').where({
+    user_id: user_id
+  });
+}
+
+module.exports = {
+  getUser: read,
+  newUser: create,
+  updateUser: update,
+  deleteUser: destroy,
+  getProg: getProgression,
+  updateProg: updateProgression,
+  getCourses: getCourses
+}
