@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Inquizica</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="Distributed Practice Testing platform and analytics." />
+    <meta name="keywords" content="education, learning" />
+    <meta name="author" content="Sean Lynch" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <script src="https://npmcdn.com/jquery@3.1.0/dist/jquery.min.js"></script>
+    <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone.js"></script> -->
+
+    <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
+    <script src="https://npmcdn.com/remarkable@1.6.2/dist/remarkable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.4/semantic.min.css" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.4/semantic.min.js"></script>
+
+    <script src="https://npmcdn.com/react@15.3.1/dist/react.js"></script>
+    <script src="https://npmcdn.com/react-dom@15.3.1/dist/react-dom.js"></script>
+
+    <style type="text/css">
+        html {
+          background-color: #f0f0f0;
+        }
+        body {
+          background: linear-gradient(to bottom, #006B94, #f0f0f0);
+        }
+        body > .grid {
+          /*height: 100%;*/
+        }
+        .image {
+          /*margin-top: -100px;*/
+        }
+        .column {
+          max-width: 450px;
+        }
+        .content {
+          color: white;
+        }
+
+        .label {
+          margin-bottom: 1em !important;
+          display: block !important;
+        }
+
+        .field {
+          margin: 0 !important;
+        }
+
+        .boxy {
+          /*border-style: solid;
+          border-width: thin;*/
+          padding: 1em;
+          width: 100%;
+          background: #B0B0B0;
+        }
+
+        .boxy label {
+          text-align: left;
+          padding-left: 4em !important;
+        }
+
+        .boxy input {
+          /*z-index: 1 !important;*/
+          top: 1em !important;
+          left: 1em !important;
+        }
+
+        .allQuestions {
+          margin-bottom: 1em !important;
+        }
+
+        .allQuestions .field:nth-child(even) .boxy {
+          background: #D0D0D0;
+        }
+
+        .allQuestions .field:first-child .boxy {
+          border-top-left-radius: 0.5em;
+          border-top-right-radius: 0.5em;
+        }
+
+        .allQuestions .field:last-child .boxy {
+          border-bottom-left-radius: 0.5em;
+          border-bottom-right-radius: 0.5em;
+        }
+
+        /*input[type="radio"]:checked {
+          background: red !important;
+        }*/
+
+        .boxy.hoverable:hover {
+          background: yellow !important;
+        }
+
+        .boxy.correct {
+          background: #38b549 !important;
+        }
+
+        .hideMe {
+          display: none !important;
+        }
+
+        .stat_holder .label {
+          display: inline-block !important;
+        }
+
+        .stat_holder .tag {
+          margin-left: 2em;
+        }
+
+        .stats {
+          margin-left: 1.5em;
+          padding: 1em;
+          position: absolute;
+          left: 0;
+          top: 0;
+          /*display: inline-block;*/
+        }
+
+        .explaination {
+          text-align: left !important;
+        }
+
+        .QuizUI {
+          margin-top: 2.5em !important;
+        }
+
+        .initBox {
+          padding: 1.5em 0 !important;
+        }
+
+        .questionBox {
+          padding: 1.5em 0 !important;
+        }
+
+        .answerBox {
+          padding: 1.5em 0 !important;
+        }
+
+        .incorrect {
+          background: #CD5C5C !important;
+        }
+
+        .selected {
+          background: yellow !important;
+        }
+        .yellow.button {
+          margin-top: 0.5em;
+        }
+
+        body {
+          overflow-y: scroll;
+        }*/
+
+    </style>
+
+  </head>
+  <body>
+
+    <!-- Quiz Title and React Container -->
+    <div style="overflow-y: auto;" class="ui middle aligned center aligned grid">
+      <div class="column">
+        <h2 class="ui blue image header">
+          <!-- <img src="assets/images/logo.png" class="image"> -->
+          <div style="margin-top: 2em;" class="content">
+            {{data.quiz.title}}
+          </div>
+        </h2>
+        <!-- Insert React Here -->
+        <div id="container">
+        </div>
+      </div>
+    </div>
+
+    <!-- Main React Script  -->
+
+    <script type="text/babel">
+
+      var categorizePhase = function (phase, last) {
+        if (phase == 0) {
+          return 0; // Init phase
+        } else if (phase == last) {
+          return 1; // Continue phase
+        } else if (phase == (last - 1)) {
+          return 2; // Results phase
+        } else if ((phase % 2 == 1) && (phase < last)) {
+          return 3; // Question phase
+        } else if ((phase % 2 == 0) && (phase < last)) {
+          return 4; // Answer phase
+        } else {
+          return 5; // Broken phase (?)
+        }
+      }
+
+      var QuizContainer = React.createClass({
+        getInitialState: function () {
+          return {
+            phase: 0,
+            lastPhase: 6,
+            quizData: {},
+            analytics: {},
+            answerData: []
+          }
+        },
+        updatePhase: function () {
+          // If we are answering a question - save the response.
+          var prePhaseType = categorizePhase(this.state.phase, this.state.lastPhase);
+          var questionNumber = Math.ceil(this.state.phase / 2) - 1;
+          if (prePhaseType == 3) {
+            this.state.answerData.push({
+              quiz_id: this.state.quizData.quiz.id,
+              question_id: $('.questionID')[0].innerHTML,
+              response_id: $('.selected .responseID')[0].innerHTML,
+              correct_id: this.state.quizData.questions[questionNumber].filter(function(res) { return res.correct; })[0].correctID
+            });
+          }
+          // Update the phase.
+          this.setState({ phase: ++this.state.phase });
+          // If we are about to render results page - send the data home.
+
+          var postPhaseType = categorizePhase(this.state.phase, this.state.lastPhase);
+          if (postPhaseType == 2) {
+            var pack = this.state.answerData;
+            $.post('/api/quiz/responses', {'data': pack}, function (response) {
+              // console.log("Submitted Data");
+            }, 'text');
+          }
+
+          // Update UI
+          $('#progress_bar').progress('increment');
+          // console.log(this.state.phase);
+        },
+        componentDidMount: function () {
+          this.serverRequest = $.get(this.props.source, function (result) {
+            console.log("Server:", this.props.source, result);
+            this.setState({
+              quizData: result,
+              lastPhase: 2 + (result.questions.length * 2),
+              analytics: {
+                questions: result.analytics,
+                quiz: {}
+              }
+            });
+            this.state.quizData.questions.forEach(function (question, index) {
+              // console.log(question[0].id, question[1].id);
+              shuffleArray(question);
+              // console.log(question[0].id, question[1].id);
+            });
+            $('#progress_bar').progress({
+              showActivity: false,
+              total: this.state.lastPhase
+            });
+          }.bind(this));
+        },
+        componentWillUnmount: function () {
+          this.serverRequest.abort();
+        },
+        render: function () {
+          var phaseType = categorizePhase(this.state.phase, this.state.lastPhase);
+          var questionNumber = Math.ceil(this.state.phase / 2) - 1;
+          return (
+            <div className="ui large">
+              <div className="ui tall stacked segment">
+                <ProgressBar phase={this.state.phase} />
+                {phaseType == 0 ? (<Init quizInfo={this.state.quizData.quiz}></Init>) : null }
+                {phaseType == 1 ? (<Continue></Continue>) : null }
+                {phaseType == 2 ? (<Results analytics={this.state.analytics} answers={this.state.answerData}></Results>) : null }
+                {phaseType == 3 ? (<Question question={this.state.quizData.questions[questionNumber]}></Question>) : null }
+                {phaseType == 4 ? (<Answer question={this.state.quizData.questions[questionNumber]} ans={this.state.answerData[questionNumber]} analytics={this.state.analytics.questions}></Answer>) : null }
+                {phaseType == 5 ? (<Error></Error>) : null }
+                <Controls phase={this.state.phase} lastPhase={this.state.lastPhase} update={this.updatePhase} />
+              </div>
+            </div>
+          )
+        }
+      });
+
+      var ProgressBar = React.createClass({
+        render: function () {
+          return (
+            <div>
+              <div id="progress_bar" className="ui green progress">
+                <div className="bar">
+                  <div className="progress"></div>
+                </div>
+                <div className="label">Quiz Completion</div>
+              </div>
+            </div>
+          );
+        }
+      });
+
+      var Controls = React.createClass({
+        render: function () {
+          var phaseType = categorizePhase(this.props.phase, this.props.lastPhase);
+          var buttonText = "";
+          var buttonStatus = "";
+          var finalPhase = false;
+          switch (phaseType) {
+            case 0:
+              buttonText = "Get Started";
+              break;
+            case 1:
+              buttonStatus = "hideMe";
+              finalPhase = true;
+              break;
+            case 2:
+              buttonText = "Next";
+              break;
+            case 3:
+              buttonStatus = "disabled";
+              buttonText = "Submit Answer";
+              break;
+            case 4:
+              buttonText = "Next Question";
+              break;
+            default:
+              buttonStatus = "hideMe";
+              buttonText = "Next";
+              break;
+          }
+          return (
+            <div>
+            {finalPhase ?
+              (<div>
+                <a className={"ui yellow button "} href="https://goo.gl/forms/JwQR0C1pOPZCfpvY2">Give Feedback</a>
+                <a className={"ui green button "} href="/api/quiz/next?current={{data.id}}">Start Next Quiz</a>
+              </div>)
+              :
+              (<button className={"ui green button " + buttonStatus} onClick={this.props.update}>{buttonText}</button>)}
+            </div>
+          )
+
+        }
+      });
+
+      var Init = React.createClass({
+        render: function () {
+          var title = "Title";
+          var author = "Author";
+          var topic = "Topic";
+          if (typeof this.props.quizInfo !== "undefined") {
+            title = this.props.quizInfo.title;
+            author = this.props.quizInfo.author;
+            topic = this.props.quizInfo.topic
+          }
+          return (
+            <div className="initBox">
+              <h2>{title}</h2>
+            </div>
+          );
+        }
+      });
+
+      var Continue = React.createClass({
+        render: function () {
+          return (
+            <div className="initBox">
+              <h3>Good job!</h3>
+              <div>You completed this quiz! We would love to hear your thoughts, both good and bad, here:</div>
+            </div>
+          );
+        }
+      });
+
+      var Error = React.createClass({
+        render: function () {
+          return (<div> You seem to have broken it, nice! </div>);
+        }
+      });
+
+      var shuffleArray = function (arr) {
+        for (var i = arr.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var temp = arr[i];
+          arr[i] = arr[j];
+          arr[j] = temp;
+        }
+        return arr;
+      }
+
+      var Question = React.createClass({
+        render: function () {
+          var title = "title";
+          if (typeof this.props.question !== "undefined") {
+            title = this.props.question[0].question;
+          }
+
+          var rows = [];
+          this.props.question.forEach(function (response, index) {
+            rows.push(<ResponseLine key={index} response={response.responseText} idnum={response.id}></ResponseLine>)
+          });
+
+          return (
+            <div className="questionBox">
+              <h3>{title}</h3>
+              <div className="ui form">
+                <div hidden className="questionID">{this.props.question[0].Question_id}</div>
+                <div className="grouped fields allQuestions">
+                  {rows}
+                </div>
+              </div>
+            </div>
+          );
+        }
+      });
+
+      var ResponseLine = React.createClass({
+        onAnsClick: function (event) {
+          $('input').attr('checked', false);
+          $('.boxy').removeClass('selected');
+          $('button.ui.green.disabled').removeClass('disabled');
+          $(event.currentTarget).find('input').attr('checked', true);
+          $(event.currentTarget).addClass('selected');
+        },
+        render: function () {
+          return (
+            <div className="fluid field">
+              <div className="ui radio checkbox boxy hoverable" onClick={this.onAnsClick}>
+                <div className="responseID" hidden>{this.props.idnum}</div>
+                <input hidden name="selectedAnswer" type="radio" />
+                <label>{this.props.response}</label>
+              </div>
+            </div>
+          )
+        }
+      })
+
+      var Answer = React.createClass({
+        render: function () {
+          var title = "title";
+          if (typeof this.props.question !== "undefined") {
+            title = this.props.question[0].question;
+          }
+
+          var rows = [];
+          var self = this;
+          this.props.question.forEach(function (response, index) {
+            var q = self.props.analytics[response.Question_id];
+            var stat = 25;
+            if (typeof q != 'undefined') {
+              var chosen = self.props.analytics[response.Question_id][response.id];
+              var total = self.props.analytics[response.Question_id].total;
+              var stat = Math.round((chosen / total) * 100);
+              if (isNaN(stat)) { stat = 0; }
+            }
+            if (response.id == self.props.ans.response_id) { var chosenAns = true; } else { var chosenAns = false; }
+            if (response.id == self.props.ans.correct_id) { var correctAns = true; }
+            rows.push(<AnalyticsLine key={index} response={response.responseText} chosen={chosenAns} correct={correctAns} nums={stat}></AnalyticsLine>);
+          });
+
+          return (
+            <div className="answerBox">
+              <h3>{title}</h3>
+              <div className="ui form">
+                <div className="grouped fields allQuestions">
+                  {rows}
+                </div>
+              </div>
+              <RemediationArea info={this.props.question[0]}></RemediationArea>
+            </div>
+          );
+        }
+      });
+
+      var AnalyticsLine = React.createClass({
+        componentDidMount: function () {
+          if (this.props.chosen) {
+            $('.selectedAns').attr('checked', true);
+          }
+        },
+        render: function () {
+          return (
+            <div className="fluid field">
+              <div className={"ui radio checkbox boxy " + (this.props.correct ? "correct " : "") + (this.props.chosen ? "incorrect" : "") }>
+                <input hidden name="selectedAnswer" type="radio" className={this.props.chosen ? "selectedAns" : ""} />
+                <label>{this.props.response}</label>
+                <span className="stats">
+                  {this.props.nums}%
+                </span>
+              </div>
+            </div>
+          )
+        }
+      })
+
+      var RemediationArea = React.createClass({
+        render: function () {
+            return (
+              <div>
+                <div className="ui message explaination">
+                  <div className="header">Explaination</div>
+                  <p>{this.props.info.remediation}</p>
+                </div>
+                <div className="stat_holder">
+                  <div className="ui label">
+                    <i className="star icon"></i>{this.props.info.avg_rating}
+                  </div>
+                  <div className="ui tag label">{this.props.info.tag}</div>
+                </div>
+              </div>
+            )
+        }
+      });
+
+      var Results = React.createClass({
+        render: function () {
+          var rows = [];
+          var self = this;
+          Object.keys(this.props.analytics.questions).forEach(function (key, index) {
+            var percent = Math.round(100 * (self.props.analytics.questions[key].correct / self.props.analytics.questions[key].total));
+            var right = self.props.answers[index].correct_id == self.props.answers[index].response_id;
+            rows.push(<div key={index}>
+              <i className={(right ? "green checkmark icon" : "red remove icon")}></i> Question #{index+1} ({percent}% answered correctly.)
+            </div>);
+          });
+          return (
+            <div className="answerBox">
+              <h3>Results</h3>
+              {rows}
+            </div>
+          );
+        }
+      });
+
+      ReactDOM.render(
+        <QuizContainer source="/api/quiz/{{data.id}}"/>, // This is also JSX.
+        document.getElementById('container')
+      );
+    </script>
+
+    <!-- <script type="text/babel">
+      var QuizContainer = React.createClass({
+        getInitialState: function () {
+          return {
+            currentStep: 0,
+            totalSteps: 1,
+            completed: false,
+            stats: {},
+            answerData: {
+              responses: [],
+              questions: [],
+              correct: [],
+              quiz: 1,
+              user: 1
+            },
+            quizData: {
+              quiz: {
+                title: "Title"
+              },
+              questions: [
+                {title: "Question Title"}
+              ],
+              user: {
+                id: 1
+              }
+            }
+          }
+        },
+        updateProgress: function () {
+          // console.log(++this.state.currentStep);
+          this.setState({ currentStep: ++this.state.currentStep });
+          console.log("Phase =", this.state.currentStep, "/", this.state.totalSteps);
+          if (this.state.currentStep % 2 == 0) {
+            console.log("Load Analytics");
+            var ans = $('.correct label')[0].innerText;
+            var qNum = Math.ceil(this.state.currentStep / 2) - 1;
+            var answerID = this.state.quizData.questions[qNum].find(function (elem) {
+              return elem.responseText == ans;
+            });
+            this.state.answerData.responses.push(answerID.id);
+            this.state.answerData.questions.push(answerID.Question_id);
+            this.state.answerData.correct.push(answerID.correctID);
+          }
+          if (this.state.currentStep == 1 + this.state.quizData.questions.length * 2) {
+            this.state.answerData.quiz = this.state.quizData.quiz.id;
+            this.state.answerData.user = this.state.quizData.user;
+            console.log("Send Data", this.state.answerData);
+            $.post('/analytics', this.state.answerData, function (results) {
+              console.log("Analytics", results);
+              this.setState({stats: results});
+              console.log(this.state.stats);
+              this.render();
+            }.bind(this));
+          }
+
+          $('input').attr('checked', false);
+          $('.boxy').removeClass('correct');
+          $('#progress_bar').progress('increment');
+        },
+        componentDidMount: function () {
+          console.log("Load Data");
+          this.serverRequest = $.get(this.props.source, function (result) {
+            // console.log("R", this.props.source, result);
+            this.setState({
+              quizData: result,
+              totalSteps: 1 + (result.questions.length * 2)
+            });
+            $('#progress_bar').progress({
+              showActivity: false,
+              total: 1 + (this.state.quizData.questions.length * 2)
+            });
+          }.bind(this));
+        },
+        componentWillUnmount: function () {
+          this.serverRequest.abort();
+        },
+        render: function () {
+          return (
+            <div className="ui large">
+              <div className="ui tall stacked segment">
+                <QuizProgress phase={this.state.currentStep} quizTitle={this.state.quizData.quiz.title} />
+                <QuizUI phase={this.state.currentStep} totalSteps={this.state.totalSteps} quizData={this.state.quizData} stats={this.state.stats} answerData={this.state.answerData} onUpdate={this.updateProgress} />
+              </div>
+            </div>
+          )
+        }
+      });
+
+      // Progress Bar
+      var QuizProgress = React.createClass({
+        render: function () {
+          var progress = "";
+          var num = 0;
+          if (this.props.phase == 0) {
+            progress = <span>Overview</span>
+          } else if (this.props.phase == 11) {
+            progress = <span>Conclusion</span>
+          } else if (this.props.phase > 11) {
+            progress = <span>Review</span>
+          } else if ((this.props.phase % 2) == 1) { // Is Question
+            num = Math.ceil(this.props.phase / 2);
+            progress = <span>Question #{num}</span>
+          } else if ((this.props.phase % 2) == 0) { // Is Answer
+            num = this.props.phase / 2;
+            progress = <span>Answer #{num}</span>
+          }
+          // <div className="ui top left attached label">{this.props.quizTitle}: {progress} </div>
+          return (
+            <div>
+              <div id="progress_bar" className="ui green progress">
+                <div className="bar">
+                  <div className="progress"></div>
+                </div>
+                <div className="label">Quiz Progress</div>
+              </div>
+            </div>
+          )
+        }
+      });
+
+      // State container for quiz.
+      var QuizUI = React.createClass({
+        getInitialState: function () {
+          return {
+            ansSelected: false
+          };
+        },
+        render: function () {
+          var headerText = "";
+          var rows = [];
+          var minorText = "";
+          var showRem = false;
+          var info = {};
+          var qNum = Math.ceil(this.props.phase / 2) - 1;
+
+          if (this.props.phase == 0) {
+            headerText = this.props.quizData.quiz.topic;
+            minorText = "By: " + this.props.quizData.quiz.author;
+          } else if (this.props.phase == this.props.totalSteps) {
+            headerText = "Results";
+            for (var i = 0; i < Object.keys(this.props.stats).length; i++) {
+              var k = Object.keys(this.props.stats)[i];
+              var percent = 100 * (this.props.stats[k].correct / this.props.stats[k].total);
+              percent = percent.toFixed(2);
+              var right = (this.props.stats[k].right == this.props.answerData.responses[i]);
+              var divStyle = {}; //{ color: right ? "green" : "red" }
+              rows.push(
+                <div key={i} style={divStyle}>
+                  <i className={(right ? "green checkmark icon" : "red remove icon")}></i> Question #{i+1} ({percent}% answered correctly.)
+                </div>
+              );
+            }
+          } else if (this.props.phase > this.props.totalSteps) {
+            headerText = "Would you like to do another Quiz now?";
+            minorText = (
+              <span>
+                <button className="ui negative button">Nope, gotta go.</button>
+                <button className="ui positive button">Yes, I love learning!</button>
+              </span>
+            );
+          } else if ((this.props.phase % 2) == 1) {
+            // Question ========================================================
+            headerText = this.props.quizData.questions[qNum][0].question;
+            for (var i = 0; i < this.props.quizData.questions[qNum].length; i++) {
+              rows.push(<AnswerLine key={i} response={this.props.quizData.questions[qNum][i].responseText} correct={null} nums={null} />);
+            }
+          } else if ((this.props.phase % 2) == 0) {
+            // Answer ==========================================================
+            headerText = this.props.quizData.questions[qNum][0].question;
+            var responses = this.props.quizData.questions[qNum].map(function (elem, indx) { return elem.responseText; });
+            var correct = this.props.quizData.questions[qNum].map(function (elem, indx) { return elem.correct; });
+            // var correct = JSON.parse(this.props.quizData.questions[qNum].correct);
+
+            // Remediation Info
+            showRem = true;
+            info.rating = this.props.quizData.questions[qNum][0].avg_rating;
+            info.topic = this.props.quizData.questions[qNum][0].tag;
+            info.explaination = this.props.quizData.questions[qNum][0].remediation;
+
+            // Stats
+            // var stats = JSON.parse(this.props.quizData.questions[qNum].stats);
+            // var total = stats.reduce(function (prev, curr) { return prev + curr; });
+            // stats = stats.map(function (elem) { return Math.round(elem/total * 100); });
+            var stats = new Array(this.props.quizData.questions[qNum].length).fill(10);
+
+            var chosen = this.props.answerData.responses;
+            console.log("PPP", stats, chosen);
+
+            // Make rows.
+            for (var i = 0; i < responses.length; i++) {
+              if (responses[i] === "") { continue; }
+              rows.push(<AnswerLine key={i} response={responses[i]} correct={correct[i]} nums={stats[i]}  />);
+            }
+          }
+
+          return (
+            // This all gets translated by JSX pre-compiler to plain JS, is optional.
+            <div className="QuizUI">
+              <h3>{headerText}</h3>
+              <p>{minorText}</p>
+              <div className="ui form">
+                <div className="grouped fields allQuestions">
+                  {rows}
+                </div>
+              </div>
+              <RemediationArea showRem={showRem} info={info} />
+              <Controls phase={this.props.phase} totalSteps={this.props.totalSteps} onUpdate={this.props.onUpdate} />
+            </div>
+          );
+        }
+      });
+
+
+
+
+
+      // Used for rendering questions and answers.
+      var AnswerLine = React.createClass({
+        onAnsClick: function (event) {
+          $('input').attr('checked', false);
+          $('.boxy').removeClass('correct');
+          $('button.ui.green.disabled').removeClass('disabled');
+          $(event.currentTarget).find('input').attr('checked', true);
+          $(event.currentTarget).addClass('correct');
+        },
+        render: function () {
+          if (this.props.nums) {
+            return (
+              <div className="fluid field">
+                <div className={"ui radio checkbox boxy " + (this.props.correct ? "correct" : "") }>
+                  <input hidden name="selectedAnswer" type="radio" />
+                  <label>{this.props.response}</label>
+                  <span className="stats">
+                    {this.props.nums}%
+                  </span>
+                </div>
+
+              </div>
+            )
+          } else {
+            return (
+              <div className="fluid field">
+                <div className="ui radio checkbox boxy hoverable" onClick={this.onAnsClick}>
+                  <input hidden name="selectedAnswer" type="radio" />
+                  <label>{this.props.response}</label>
+                </div>
+              </div>
+            )
+          }
+
+        }
+      });
+
+      // Displays rating, topic and remediation for answer screen.
+      var RemediationArea = React.createClass({
+        render: function () {
+          if (this.props.showRem) {
+            return (
+              <div>
+                <div className="ui message explaination">
+                  <div className="header">Explaination</div>
+                  <p>{this.props.info.explaination}</p>
+                </div>
+                <div className="stat_holder">
+                  <div className="ui label">
+                    <i className="star icon"></i>{this.props.info.rating}
+                  </div>
+                  <div className="ui tag label">{this.props.info.topic}</div>
+                </div>
+              </div>
+            )
+          } else {
+            return (<div></div>)
+          }
+        }
+      });
+
+      // Changes button text based on phase and if answer selected.
+      // Also updates the phase when button clicked.
+      var Controls = React.createClass({
+        render: function () {
+          var buttonOne = "";
+          var tooFar = this.props.phase > this.props.totalSteps;
+          var question_phase = false;
+          if (tooFar) console.log("Complete");
+          if (this.props.phase == 0) {
+            buttonOne = "Get Started";
+          } else if (this.props.phase == this.props.totalSteps - 1) {
+            buttonOne = "See Results";
+          } else if (this.props.phase > this.props.totalSteps - 1) {
+            buttonOne = "Next";
+          } else if ((this.props.phase % 2) == 1) {
+            question_phase = true;
+            buttonOne = "Submit Answer";
+          } else if ((this.props.phase % 2) == 0) {
+            buttonOne = "Next Question";
+          }
+          return (
+            <button className={"ui green button " + (tooFar ? "hideMe" : "") + (question_phase ? "disabled" : "")} onClick={this.props.onUpdate}>
+              {buttonOne}
+            </button>
+          )
+        }
+      });
+
+      ReactDOM.render(
+        <QuizContainer source="/api/quiz/{{data.quiz.id}}"/>, // This is also JSX.
+        document.getElementById('container')
+      );
+    </script> -->
+  </body>
+</html>

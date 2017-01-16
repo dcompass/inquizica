@@ -30,7 +30,7 @@ router.post('/user/', jsonParser, function (req, res, next) {
   User.newUser(req.body)
     .then(function (data) {
       res.set('Location', '/account');
-      res.status(301).end();
+      res.status(303).end();
     })
     .catch(function (err) {
       // logger.log('error', 'Could not create user.');
@@ -132,12 +132,30 @@ router.get('/user/:id/courses', function (req, res, next) {
 
 // =================================================
 
-router.post('/course/', function (req, res, next) {
-  res.status(500).end("No");
+router.post('/course', jsonParser, function (req, res, next) {
+  Course.newCourse(req.body)
+    .then(function (data) {
+      res.set('location', '/');
+      res.status(301).end();
+    })
+    .catch(function (err) {
+      res.set('location', '/');
+      res.status(400).end();
+    });
 });
 
 router.get('/course/:id', function (req, res, next) {
-  res.status(500).end("No");
+  Course.getCourse(req.params.id)
+    .then(function (data) {
+      if (data.length == 0) {
+        res.status(404).json({});
+      } else {
+        res.status(200).json(data[0]);
+      }
+    })
+    .catch(function (err) {
+      res.status(404).json({});
+    });
 });
 
 router.put('/course/:id', function (req, res, next) {
@@ -145,7 +163,73 @@ router.put('/course/:id', function (req, res, next) {
 });
 
 router.delete('/course/:id', function (req, res, next) {
-  res.status(500).end("No");
+  Course.getCourse(req.params.id)
+    .then(function (data) {
+      if (data.length == 0) {
+        res.status(404).end();
+      } else {
+        Course.delCourse(req.params.id)
+          .then(function (data) {
+            res.status(200).end();
+          })
+          .catch(function (err) {
+            res.status(500).end();
+          });
+      }
+    })
+    .catch(function (err) {
+      res.status(500).end();
+    });
+});
+
+router.get('/course/:id/quizzes', function (req, res, next) {
+  Course.getQuizzes(req.params.id)
+    .then(function (data) {
+      if (data.length == 0) {
+        res.status(404).json({});
+      } else {
+        res.status(200).json(data);
+      }
+    })
+    .catch(function (err) {
+      res.status(404).json({});
+    });
+});
+
+router.get('/course/:id/schedule', function (req, res, next) {
+  Course.getSchedule(req.params.id)
+    .then(function (data) {
+      if (data.length == 0) {
+        res.status(404).json({});
+      } else {
+        res.status(200).json(data);
+      }
+    })
+    .catch(function (err) {
+      res.status(501).json({});
+    });
+});
+
+router.get('/course/:id/topics', function (req, res, next) {
+  Course.getTopics(req.params.id)
+    .then(function (data) {
+      if (data.length == 0) {
+        res.status(404).json({});
+      } else {
+        res.status(200).json(data);
+      }
+    })
+    .catch(function (err) {
+      res.status(501).json({});
+    });
+});
+
+router.put('/course/:id/user', function (req, res, next) {
+  res.status(500).end();
+});
+
+router.put('/course/:id/quiz', function (req, res, next) {
+  res.status(500).end();
 });
 
 // =================================================

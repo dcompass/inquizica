@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Inquizzica</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="Distributed Practice Testing platform and analytics." />
+    <meta name="keywords" content="education, learning" />
+    <meta name="author" content="Sean Lynch" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <script src="https://npmcdn.com/jquery@3.1.0/dist/jquery.min.js"></script>
+    <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone.js"></script> -->
+
+    <!-- <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
+    <script src="https://npmcdn.com/remarkable@1.6.2/dist/remarkable.min.js"></script> -->
+
+
+    <!-- <script src="https://npmcdn.com/react@15.3.1/dist/react.js"></script>
+    <script src="https://npmcdn.com/react-dom@15.3.1/dist/react-dom.js"></script> -->
+
+    <link rel="stylesheet" href="../public/css/pikaday.css"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.4/semantic.min.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/async/2.1.4/async.js"></script>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.4/semantic.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
+    <script src="../public/javascripts/pikaday.js"></script>
+
+    <style type="text/css">
+      #logo {
+        font-family: 'Bitter', serif;
+        font-size: 1.5em;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
+      #quiz_list {
+        background: white;
+        padding-bottom: 0.5em;
+      }
+
+      body {
+        background: #f0f0f0 !important;
+      }
+
+      .hidden.menu {
+        display: none;
+      }
+
+      .masthead.segment {
+        min-height: 80px;
+        padding: 1em 0em;
+      }
+      .masthead .logo.item img {
+        margin-right: 1em;
+      }
+      .masthead .ui.menu .ui.button {
+        margin-left: 0.5em;
+      }
+      .masthead h1.ui.header {
+        margin-top: 1.2em;
+        margin-bottom: 0em;
+        font-size: 4em;
+        font-weight: normal;
+      }
+      .masthead h2 {
+        font-size: 1.7em;
+        font-weight: normal;
+      }
+
+      .ui.vertical.stripe {
+        padding: 8em 0em;
+      }
+      .ui.vertical.stripe h3 {
+        font-size: 2em;
+      }
+      .ui.vertical.stripe .button + h3,
+      .ui.vertical.stripe p + h3 {
+        margin-top: 3em;
+      }
+      .ui.vertical.stripe .floated.image {
+        clear: both;
+      }
+      .ui.vertical.stripe p {
+        font-size: 1.33em;
+      }
+      .ui.vertical.stripe .horizontal.divider {
+        margin: 3em 0em;
+      }
+
+      .quote.stripe.segment {
+        padding: 0em;
+      }
+      .quote.stripe.segment .grid .column {
+        padding-top: 5em;
+        padding-bottom: 5em;
+      }
+
+      .footer.segment {
+        padding: 5em 0em;
+      }
+
+      .secondary.pointing.menu .toc.item {
+        display: none;
+      }
+
+      .masthead {
+        background: #006C94 !important;
+        background-position: center center !important;
+      }
+
+      .ui.secondary.pointing.menu,
+      .ui.secondary.inverted.pointing.menu {
+        border-color: transparent !important;
+      }
+
+      @media only screen and (max-width: 700px) {
+        .ui.fixed.menu {
+          display: none !important;
+        }
+        .secondary.pointing.menu .item,
+        .secondary.pointing.menu .menu {
+          display: none;
+        }
+        .secondary.pointing.menu .toc.item {
+          display: block;
+        }
+        .masthead.segment {
+          min-height: 350px;
+        }
+        .masthead h1.ui.header {
+          font-size: 2em;
+          margin-top: 1.5em;
+        }
+        .masthead h2 {
+          margin-top: 0.5em;
+          font-size: 1.5em;
+        }
+      }
+    </style>
+
+  </head>
+  <body>
+
+    <div class="pusher">
+
+      <!-- Nav -->
+      <div class="ui inverted vertical masthead center aligned segment">
+
+        <div class="ui container">
+          <div class="ui large secondary inverted pointing menu">
+            <a class="toc item">
+              <i class="sidebar icon"></i>
+            </a>
+            <a id="logo" class="header item" href="/">Inquizica</a>
+            <div style="line-height: 1.4em;" class="item">Course Creator</div>
+            <!-- <a class="item">Careers</a> -->
+            <div class="right item">
+              <a href="/account" class="ui inverted button">Account</a>
+              <a href="/logout" class="ui inverted button">Log out</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Steps -->
+      <div class="ui four top attached steps">
+        <div class="uno active step">
+          <i class="info icon"></i>
+          <div class="content">
+            <div class="title">Basic Info</div>
+            <div class="description">About the course</div>
+          </div>
+        </div>
+        <div class="dos disabled step">
+          <i class="comment outline icon"></i>
+          <div class="content">
+            <div class="title">Lecture Topics</div>
+            <div class="description">Generate a schedule</div>
+          </div>
+        </div>
+        <div class="tres disabled step">
+          <i class="delete calendar icon"></i>
+          <div class="content">
+            <div class="title">Exam Dates</div>
+            <div class="description">Midterms, Finals, etc.</div>
+          </div>
+        </div>
+        <div class="quatro disabled step ">
+          <i class="pin icon"></i>
+          <div class="content">
+            <div class="title">Review</div>
+            <div class="description">Verify details</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div style="margin: 1em 0;" class="ui hidden section divider"></div>
+
+      <div class="column" style="width: 70% !important; margin: 0 auto;">
+
+        <!-- Step #1 -->
+        <div id="first" class="first screen ui container">
+          <!-- Instructions -->
+          <div class="ui positive message">
+            <div class="header">
+              Getting Started
+            </div>
+            <p>First, choose a start and end date for your class lectures. Then select which days you have lecture on and hit "view schedule".</p>
+          </div>
+
+          <!-- Form -->
+          <div class="ui form">
+            <div class="four fields">
+              <div class="field">
+                <label>Course Title</label>
+                <input type="text" class="course_title" placeholder="Anthropology 101">
+              </div>
+              <div class="field">
+                <label>Instructor</label>
+                <input type="text" class='author' placeholder="I. Jones">
+              </div>
+              <div class="field">
+                <label>Institution</label>
+                <input type="text" class='affiliation' placeholder="University of...">
+              </div>
+              <div class="field">
+                <label>Topic</label>
+                <input type="text" class='tmp_topic' placeholder="Cultural Anthopology">
+                <!-- <select class='ui fluid dropdown tmp_topic'>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                </select> -->
+              </div>
+            </div>
+            <div class="field">
+              <label>Description</label>
+              <textarea rows="3" class='desc' placeholder="A course about society and culture."></textarea>
+            </div>
+            <div class="four fields">
+              <div class="field start">
+                <label>Start Date</label>
+                <input type="text" id="datepicker1">
+              </div>
+              <div class="field end">
+                <label>End Date</label>
+                <input type="text" id="datepicker2">
+              </div>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="ui right aligned container">
+            <br />
+            <button class="orange ui button reset">
+              Reset This Page
+            </button>
+            <button class="green ui button next loadSecond">
+              Continue
+            </button>
+          </div>
+        </div>
+
+        <!-- Step #2 -->
+        <div id="second" class="second screen ui container">
+          <!-- Instructions -->
+          <div class="ui positive message">
+            <div class="header">
+              Make a Schedule
+            </div>
+            <p>First, choose a start and end date for your class lectures. Then select which days you have lecture on and hit "view schedule".</p>
+          </div>
+
+          <!-- Form -->
+          <div class="ui form">
+            <div class="fields">
+              <div class="field">
+                <label>Number of Lectures</label>
+                <input type="text" class="numTopics" placeholder="10">
+              </div>
+              <div class='field'>
+                <button id="generate_topics" style="position: absolute; bottom: 0;" class="green ui button" > Create Blank Schedule </button>
+              </div>
+              <div class='field'>
+                <button style="position: absolute; bottom: 0; left: 395px;" class="ui blue button add_lecture"> Add Single Lecture </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="ui form">
+            <div class="inline fields">
+              <span style="padding-right: 1.5em;"><strong>Lectures:</strong></span>
+              <div class="ui checkbox" style="padding-right: 1.5em;">
+                <input name="Monday" type="checkbox">
+                <label>Monday</label>
+              </div>
+              <div class="ui checkbox"  style="padding-right: 1.5em;">
+                <input name="Tuesday" type="checkbox">
+                <label>Tuesday</label>
+              </div>
+              <div class="ui checkbox"  style="padding-right: 1.5em;">
+                <input name="Wednesday" type="checkbox">
+                <label>Wednesday</label>
+              </div>
+              <div class="ui checkbox"  style="padding-right: 1.5em;">
+                <input name="Thursday" type="checkbox">
+                <label>Thursday</label>
+              </div>
+              <div class="ui checkbox"  style="padding-right: 1.5em;">
+                <input name="Friday" type="checkbox">
+                <label>Friday</label>
+              </div>
+              <button id="generate" class="green ui button">
+                View Schedule
+              </button>
+            </div>
+          </div> -->
+
+          <!-- Table -->
+          <div class="ui container">
+            <table class="ui fixed single line table">
+              <thead>
+                <tr>
+                  <th class="five wide">Lecture/Class Date</th>
+                  <th class="eleven wide">Topic</th>
+                </tr>
+              </thead>
+              <tbody class="topic_table"></tbody>
+            </table>
+          </div>
+
+          <!-- Buttons -->
+          <div class="ui right aligned container">
+            <br />
+            <button class="orange ui button reset">
+              Reset This Page
+            </button>
+            <button class="grey ui button back">
+              Back
+            </button>
+            <button class="green ui button next">
+              Continue
+            </button>
+          </div>
+
+
+        </div>
+
+        <!-- Step #3 -->
+        <div id="third" class="third screen ui container">
+          <div class="ui positive message">
+            <div class="header">
+              Add Exam Dates
+            </div>
+            <p>Enter the number of exams you will have during this course. Then press "Generate" and add dates for each one.</p>
+          </div>
+
+          <div class="ui form">
+            <div class="two fields">
+              <div class="field" style="width: 200px;">
+                <label>Number of Exams</label>
+                <input type="text" id="num_exams">
+              </div>
+              <div class='field'>
+                <button style="position: absolute; bottom: 0;" class="green ui button generate_exams"> Generate </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="ui container">
+            <table class="ui fixed single line table">
+              <thead>
+                <tr>
+                  <th class="five wide">Exam</th>
+                  <th class="eleven wide">Date</th>
+                </tr>
+              </thead>
+              <tbody class="exam_table">
+                <!-- <tr>
+                  <td>September 14, 2013</td>
+                  <td style="overflow:visible;">
+                    <select class="ui search dropdown" multiple="">
+                      <option value="">Topic</option>
+                      <option value="o">One</option>
+                      <option value="t">Two</option>
+                    </select>
+                  </td>
+                  <td>10</td>
+                </tr> -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="ui right aligned container">
+            <br />
+            <button class="orange ui button reset">
+              Reset This Page
+            </button>
+            <button class="grey ui button back">
+              Back
+            </button>
+            <button class="green ui button next loadFourth">
+              Continue
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Step #4 -->
+        <div id="fourth" class="fourth screen ui container">
+          <div class="ui positive message">
+            <div class="header">
+              Finish Up
+            </div>
+            <p>First, choose a start and end date for your class lectures. Then select which days you have lecture on and hit "view schedule".</p>
+          </div>
+
+          <div class="ui three column grid container">
+            <div class="column">
+              <div class="ui segment">
+                <div class="basic"></div>
+              </div>
+            </div>
+            <div class="column">
+              <div class="ui segment">
+                <div class="topics"></div>
+              </div>
+            </div>
+            <div class="column">
+              <div class="ui segment">
+                <div class="exams"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ui right aligned container">
+            <br />
+            <button class="grey ui button back">
+              Back
+            </button>
+            <button class="green ui button finish">
+              Save and Finish
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin: 1em 0;" class="ui hidden section divider"></div>
+
+    </div>
+
+
+
+    <script type="text/babel">
+      // To get started with this tutorial running your own code, simply remove
+      // the script tag loading scripts/example.js and start writing code here.
+    </script>
+
+    <!-- Main JS -->
+    <script>
+      $(function () {
+
+        // Correctly Done ====================================
+
+        // Setup
+        $('.second').hide();
+        $('.third').hide();
+        $('.fourth').hide();
+        $('.ui.dropdown').dropdown();
+
+        // Helper Functions
+
+        /**
+         * Create a new pikaday object.
+         * @param  {String} id          HTML id attribute.
+         * @param  {Bool}   defaultDate Option to use today as the default date.
+         * @param  {String} minDate     moment.toDate() string for min.
+         * @param  {String} maxDate     moment.toDate() string for max.
+         * @return {Object}             The pikaday object we just created.
+         */
+        var initPicker = function (id, defaultDate, minDate, maxDate) {
+          // Id is required.
+          if (!id) return {};
+
+          // Options and defaults.
+          if (!defaultDate) defaultDate = null;
+          minDate = minDate || null;
+          maxDate = maxDate || null;
+
+          var picker = new Pikaday({
+            field: document.getElementById(id),
+            format: 'D MMM YYYY',
+            minDate: minDate,
+            maxDate: maxDate,
+            defaultDate: moment().toDate(),
+            setDefaultDate: defaultDate
+          });
+
+          return picker;
+        }
+
+        var displaySummary = function () {
+          // Clear and title
+          $('.basic').html("");
+          $('.basic').append("<h3>Basic Info</h3>");
+          $('.topics').html("");
+          $('.topics').append("<h3>Topic Dates</h3>");
+          $('.exams').html("");
+          $('.exams').append("<h3>Exam Dates</h3>");
+
+          // Show Basic Info
+          $('.basic').append("<div><strong>Title:</strong> " + $('.course_title').val() + "</div>");
+          $('.basic').append("<div><strong>Instructor:</strong> " + $('.author').val() + "</div>");
+          $('.basic').append("<div><strong>Institution:</strong> " + $('.affiliation').val() + "</div>");
+          $('.basic').append("<div><strong>Description:</strong> " + $('.desc').val() + "</div>");
+          $('.basic').append("<div><strong>Main Topic:</strong> " + $('.tmp_topic').val() + "</div>");
+          $('.basic').append("<div><strong>Start Date:</strong> " + $('#datepicker1').val() + "</div>");
+          $('.basic').append("<div><strong>End Date:</strong> " + $('#datepicker2').val() + "</div>");
+
+          // Show Topic Info
+          var topics = [];
+          var date;
+          var tops;
+          $('.topics').html('');
+          $('.topic_table tr').each(function (row_index) {
+            $(this).find('td').each(function (index) {
+              if (index == 0) {
+                var id = "#topicPicker" + row_index;
+                date = $(this).find(id).val();
+              }
+              if (index == 1) { tops = $(this).find('div.text').text(); }
+            });
+            topics.push({ 'date': date, 'topics': tops });
+            $('.topics').append("<div>"+date+" # "+tops+"</div>");
+          });
+
+          // Show Exam Info
+          var exams = [];
+          $('.exams').html('');
+          $('.exam_table tr').each(function (row_index) {
+            $(this).find('td').each(function (index) {
+              if (index == 1) {
+                var id = "#exampicker" + row_index;
+                exams.push($(this).find(id).val());
+                $('.exams').append("<div>"+$(this).find(id).val()+"</div>");
+              }
+            });
+          });
+        }
+
+        var submitCourse = function (cb) {
+          // Show Topic Info
+          var topics = [];
+          var date;
+          var tops;
+          var quiz_id;
+          $('.topic_table tr').each(function (row_index) {
+            $(this).find('td').each(function (index) {
+              if (index == 0) {
+                var id = "#topicPicker" + row_index;
+                date = $(this).find(id).val();
+              }
+              if (index == 1) {
+                tops = $(this).find('div.text').text();
+                quiz_id = $(this).find('div.ui.dropdown').dropdown('get value');
+              }
+            });
+            topics.push({ 'date': date, 'topic': tops, 'id': quiz_id });
+            // $('.topics').append("<div>"+date+" # "+tops+"</div>");
+          });
+
+          // Show Exam Info
+          var exams = [];
+          $('.exam_table tr').each(function (row_index) {
+            $(this).find('td').each(function (index) {
+              if (index == 1) {
+                var id = "#exampicker" + row_index;
+                exams.push($(this).find(id).val());
+                // $('.exams').append("<div>"+$(this).find(id).val()+"</div>");
+              }
+            });
+          });
+
+          var course_title = $('.course_title').val(),
+              author = $('.author').val(),
+              affiliation = $('.affiliation').val(),
+              desc = $('.desc').val(),
+              tmp_topic = $('.tmp_topic').val(),
+              datePicker1 = $('#datepicker1').val(),
+              datePicker2 = $('#datepicker2').val();
+
+          var pack = {
+            'topics': topics,
+            'exams': exams,
+            'info': {
+              course_title,
+              author,
+              affiliation,
+              desc,
+              tmp_topic,
+              datePicker1,
+              datePicker2
+            }
+          }
+          $.post('/scheduler', pack, function (data) {
+            console.log("P", data);
+            cb(null, data);
+          });
+        }
+
+        var getTopics = function (cb) {
+          $.get('/scheduler/topics', function (data) {
+            cb(null, data);
+          });
+        }
+
+        var generateTopicDropdown = function (items) {
+          var options = "";
+          for (var i = 0; i < items.length; i++) {
+            options += "<option value='"+ items[i].id +"'>"+ items[i].title +"</option>";
+          }
+          return (
+            "<select class='ui fluid search dropdown'>" +
+              "<option value='' selected>Topic</option>" +
+              options +
+            "</select>"
+          );
+        }
+
+        // More setup?
+
+        initPicker('datepicker1', true);
+        initPicker('datepicker2', false, moment().add(5, 'days').toDate(), moment().add(6, 'months').toDate());
+
+        // Button Handlers
+        $('.loadSecond').one('click', function (e) {
+          e.preventDefault();
+          // getTopics(function (err, data) {
+          //   topicItems = data;
+          //   console.log("A", data);
+          // });
+        });
+
+        $('.loadFourth').on('click', function (e) {
+          e.preventDefault();
+          displaySummary();
+        });
+
+        $('.finish').on('click', function (e) {
+          e.preventDefault();
+          submitCourse(function (err, data) {
+            window.location = data.data;
+            // console.log("B", err, data);
+          });
+        });
+
+        // Interface Buttons
+
+        $('#generate_topics').on('click', function (e) {
+          e.preventDefault();
+          $('.topic_table').html('');
+
+          var num = Number($('.numTopics').val());
+          if (num > 65) {
+            num = 65;
+            $('.numTopics').val('65');
+          }
+          var counter = 0;
+
+          getTopics(function (err, topics) {
+            while (counter < num) {
+              $(".topic_table").append("<tr>" +
+                "<td style='overflow:visible;'>" +
+                  "<div class='field'>" +
+                    "<input type='text' id='topicPicker"+counter+"'>" +
+                  "</div>" +
+                "</td>" +
+                  "<td style='overflow:visible;'>" +
+                    generateTopicDropdown(topics) +
+                  "</td>" +
+                "</tr>");
+                counter++;
+            }
+
+            var pickers = [];
+            var arr = (new Array(Number(num))).fill(0);
+            async.eachOfSeries(arr, function (item, index, cb) {
+              var id = "#topicPicker" + index;
+
+              var min = moment($('#datepicker1').val(), "D MMM YYYY").toDate();
+              var max = moment($('#datepicker2').val(), "D MMM YYYY").toDate();
+
+              // var pk = initPicker($(id)[0], true, min, max);
+
+              var pk = new Pikaday({
+                field: $(id)[0],
+                format: 'D MMM YYYY',
+                minDate: min,
+                maxDate: max,
+                defaultDate: moment().toDate(),
+                setDefaultDate: true
+              });
+              pickers.push(pk);
+              cb(null);
+            }, function (err, other) {
+              if (err) console.log(err);
+            });
+
+            // Initialize semantic UI dropdowns in table.
+            $('.ui.dropdown').dropdown();
+            // $('#generate_topics').hide();
+          });
+        });
+
+        $('.add_lecture').on('click', function (e) {
+          e.preventDefault();
+
+          var t = Number($('.numTopics').val());
+          $('.numTopics').val(t + 1);
+          var pickerNumber = $('.topic_table tr').length;
+
+          async.series([
+            function (callback) {
+              getTopics(function (err, topics) {
+                $('.topic_table').append("<tr>" +
+                  "<td style='overflow:visible;'>" +
+                    "<div class='field'>" +
+                      "<input type='text' id='topicPicker"+pickerNumber+"'>" +
+                    "</div>" +
+                  "</td>" +
+                  "<td style='overflow:visible;'>" +
+                    generateTopicDropdown(topics) +
+                  "</td>" +
+                  "</tr>");
+              });
+              callback(null);
+            },
+            function (callback) {
+              setTimeout(function () {
+                var id = "#topicPicker" + pickerNumber;
+                var pk = new Pikaday({
+                  field: $(id)[0],
+                  format: 'D MMM YYYY',
+                  minDate: moment($('#datepicker1').val(), "D MMM YYYY").toDate(),
+                  maxDate: moment($('#datepicker2').val(), "D MMM YYYY").toDate(),
+                  defaultDate: moment().toDate(),
+                  setDefaultDate: true
+                });
+                callback(null);
+              }, 100);
+            }
+          ], function (err, results) {
+            if (err) console.log(err);
+            $('.ui.dropdown').dropdown();
+          });
+        });
+
+        $(".generate_exams").on('click', function (e) {
+          e.preventDefault();
+          $('.exam_table').html('');
+          var num = $('#num_exams').val();
+          var pickers = [];
+
+          for (var i = 0; i < (num - 1); i++) {
+            $(".exam_table").append("<tr>" +
+                "<td>" +
+                "Exam #" + (i + 1) +
+                "</td>" +
+                "<td style='overflow:visible;'>" +
+                  "<div class='field'>" +
+                    "<input type='text' id='exampicker"+i+"'>" +
+                  "</div>" +
+                "</td>" +
+              "</tr>");
+          }
+          $(".exam_table").append(
+            "<tr>" +
+              "<td>" +
+              "Final" +
+              "</td>" +
+              "<td style='overflow:visible;'>" +
+                "<div class='field'>" +
+                  "<input type='text' id='exampicker"+(num - 1)+"'>" +
+                "</div>" +
+              "</td>" +
+            "</tr>");
+
+          var arr = (new Array(Number(num))).fill(0);
+          async.eachOfSeries(arr, function (item, index, cb) {
+            var id = "exampicker" + index;
+            var pk = new Pikaday({
+              field: document.getElementById(id),
+              format: 'D MMM YYYY',
+              minDate: moment($('#datepicker1').val(), "D MMM YYYY").toDate(),
+              maxDate: moment($('#datepicker2').val(), "D MMM YYYY").toDate(),
+              defaultDate: moment().toDate(),
+              setDefaultDate: true
+            });
+            pickers.push(pk);
+            cb(null);
+          }, function (err) {
+            if (err) console.log(err);
+          });
+        });
+
+        // Control Flow
+
+        $('.next').on('click', function (e) {
+          e.preventDefault();
+
+          var currClass = $(this).closest('.screen').attr('id');
+          var currIndex = $('.screen').index($('#' + currClass));
+          var currPage = $('#' + currClass);
+          var currTab = $($('.step')[currIndex]);
+
+          var nextClass = $($('.screen')[currIndex + 1]).attr('id');
+          var nextPage = $('#' + nextClass);
+          var nextTab = $($('.step')[currIndex + 1]);
+
+          currPage.hide();
+          nextPage.show();
+
+          currTab.removeClass('active');
+          nextTab.removeClass('disabled');
+          nextTab.addClass('active');
+        });
+
+        $('.back').on('click', function (e) {
+          e.preventDefault();
+
+          var currClass = $(this).closest('.screen').attr('id');
+          var currIndex = $('.screen').index($('#' + currClass));
+          var currPage = $('#' + currClass);
+          var currTab = $($('.step')[currIndex]);
+
+          var prevClass = $($('.screen')[currIndex - 1]).attr('id');
+          var prevPage = $('#' + prevClass);
+          var prevTab = $($('.step')[currIndex - 1]);
+
+          currPage.hide();
+          prevPage.show();
+
+          currTab.removeClass('active');
+          prevTab.addClass('active');
+        });
+
+        $('.reset').on('click', function (e) {
+          e.preventDefault();
+
+          var currClass = $(this).closest('.screen').attr('id');
+          var currIndex = $('.screen').index($('#' + currClass));
+
+          switch (currIndex) {
+            case 0:
+              $('.course_title').val(''),
+              $('.author').val(''),
+              $('.affiliation').val(''),
+              $('.desc').val(''),
+              $('.tmp_topic').val(''),
+              $('#datepicker1').val(''),
+              $('#datepicker2').val('');
+              break;
+            case 1:
+              $('.topic_table').html('');
+              $('.numTopics').val('');
+              break;
+            case 2:
+              $('.exam_table').html('');
+              $('#num_exams').val('');
+              break;
+            default:
+              alert("Error, please refresh the page");
+              break;
+          }
+
+        });
+
+      });
+    </script>
+
+  </body>
+</html>

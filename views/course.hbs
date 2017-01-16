@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Inquizzica</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="Distributed Practice Testing platform and analytics." />
+    <meta name="keywords" content="education, learning" />
+    <meta name="author" content="Sean Lynch" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <script src="https://npmcdn.com/jquery@3.1.0/dist/jquery.min.js"></script>
+    <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone.js"></script> -->
+
+    <!-- <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
+    <script src="https://npmcdn.com/remarkable@1.6.2/dist/remarkable.min.js"></script> -->
+
+
+    <!-- <script src="https://npmcdn.com/react@15.3.1/dist/react.js"></script>
+    <script src="https://npmcdn.com/react-dom@15.3.1/dist/react-dom.js"></script> -->
+
+    <link rel="stylesheet" href="../public/css/pikaday.css"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.4/semantic.min.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/async/2.1.4/async.js"></script>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.4/semantic.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
+    <script src="../public/javascripts/pikaday.js"></script>
+
+    <style type="text/css">
+      #logo {
+        font-family: 'Bitter', serif;
+        font-size: 1.5em;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
+      #quiz_list {
+        background: white;
+        padding-bottom: 0.5em;
+      }
+
+      body {
+        background: #f0f0f0 !important;
+      }
+
+      .hidden.menu {
+        display: none;
+      }
+
+      .masthead.segment {
+        min-height: 80px;
+        padding: 1em 0em;
+      }
+      .masthead .logo.item img {
+        margin-right: 1em;
+      }
+      .masthead .ui.menu .ui.button {
+        margin-left: 0.5em;
+      }
+      .masthead h1.ui.header {
+        margin-top: 1.2em;
+        margin-bottom: 0em;
+        font-size: 4em;
+        font-weight: normal;
+      }
+      .masthead h2 {
+        font-size: 1.7em;
+        font-weight: normal;
+      }
+
+      .ui.vertical.stripe {
+        padding: 8em 0em;
+      }
+      .ui.vertical.stripe h3 {
+        font-size: 2em;
+      }
+      .ui.vertical.stripe .button + h3,
+      .ui.vertical.stripe p + h3 {
+        margin-top: 3em;
+      }
+      .ui.vertical.stripe .floated.image {
+        clear: both;
+      }
+      .ui.vertical.stripe p {
+        font-size: 1.33em;
+      }
+      .ui.vertical.stripe .horizontal.divider {
+        margin: 3em 0em;
+      }
+
+      .quote.stripe.segment {
+        padding: 0em;
+      }
+      .quote.stripe.segment .grid .column {
+        padding-top: 5em;
+        padding-bottom: 5em;
+      }
+
+      .footer.segment {
+        padding: 5em 0em;
+      }
+
+      .secondary.pointing.menu .toc.item {
+        display: none;
+      }
+
+      .masthead {
+        background: #006C94 !important;
+        background-position: center center !important;
+      }
+
+      .ui.large.secondary.pointing.menu,
+      .ui.large.secondary.inverted.pointing.menu {
+        border-color: transparent !important;
+      }
+
+      @media only screen and (max-width: 700px) {
+        .ui.fixed.menu {
+          display: none !important;
+        }
+        .secondary.pointing.menu .item,
+        .secondary.pointing.menu .menu {
+          display: none;
+        }
+        .secondary.pointing.menu .toc.item {
+          display: block;
+        }
+        .masthead.segment {
+          min-height: 80px;
+        }
+        .masthead h1.ui.header {
+          font-size: 2em;
+          margin-top: 1.5em;
+        }
+        .masthead h2 {
+          margin-top: 0.5em;
+          font-size: 1.5em;
+        }
+      }
+    </style>
+
+    <script src="https://d3js.org/d3.v3.js"></script>
+
+    <!-- <style>
+      svg {
+      font: 10px sans-serif;
+      }
+
+      rect.bar {
+      fill: steelblue;
+      }
+
+      rect.bar:hover {
+      fill: brown;
+      }
+
+      .value {
+      fill: white;
+      }
+
+      .axis {
+      shape-rendering: crispEdges;
+      }
+
+      .axis path {
+      stroke: none;
+      }
+
+      .x.axis line {
+      stroke: black;
+      stroke-opacity: 0.6;
+      }
+
+      .x.axis .domain {
+        opacity: 0
+      }
+
+      .y.axis line {
+      stroke: black;
+      }
+    </style> -->
+
+    <style>
+      .analytics3 rect {
+        /*fill: red;*/
+      }
+      .secondary.menu .item {
+        cursor: pointer;
+      }
+    </style>
+
+  </head>
+  <body>
+
+    <div class="pusher">
+
+      <!-- Nav -->
+      <div class="ui inverted vertical masthead center aligned segment">
+
+        <div class="ui container">
+          <div class="ui large secondary inverted pointing menu">
+            <a class="toc item">
+              <i class="sidebar icon"></i>
+            </a>
+            <a id="logo" class="header item" href="/">Inquizica</a>
+            <div style="line-height: 1.4em;" class="item">Course Dashboard</div>
+            <!-- <a class="item">Careers</a> -->
+            <div class="right item">
+              <a href="/account" class="ui inverted button">Account</a>
+              <a href="/logout" class="ui inverted button">Log out</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div style="margin: 1em 0;" class="ui hidden section divider"></div>
+
+      <div class="column" style="width: 85% !important; margin: 0 auto;">
+
+      <div class="ui segment">
+
+        <!-- Dashboard Menu  -->
+        <div class="ui secondary pointing menu" style="border-bottom: 2px solid rgba(34,36,38,.15);">
+          <div class="active item overview">Overview</div>
+          <div class="item schedule">Schedule</div>
+          <div class="item course">Course Analytics</div>
+          <div class="item student">Student Analytics</div>
+        </div>
+
+        <!-- Content -->
+        <div class="ui content segment">
+
+          <!-- Overview -->
+          <div class="overview tab">
+            <div class="ui items">
+              <div class="item">
+                <div class="image">
+                  <img src="http://www.placehold.it/150x150">
+                </div>
+                <div class="content">
+                  <div>
+                    <a href="#" class="header" style="font-size:1.3em; font-weight:700;">{{overview.title}}</a>
+                  </div>
+                  <div class="meta">
+                    <span>{{overview.description}}</span>
+                  </div>
+                  <div class="description">
+                    <p><strong>Instructor:</strong> {{overview.author}} at {{overview.institution}}</p>
+                    <p><strong>Timeline:</strong> {{overview.startdate}} thru {{overview.enddate}}</p>
+                  </div>
+                  <div class="extra" style="padding-left: 1em;">
+                    <a class="ui tag label">{{overview.topics}}</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Schedule -->
+          <div class="schedule tab">
+            <div class="ui list">
+              {{#each schedule}}
+                <div class="item">
+                  <div class="header">{{this.title}}</div>
+                  {{this.quizDate}}
+                </div>
+              {{/each}}
+            </div>
+          </div>
+
+          <!-- Course Analytics  -->
+          <div class="course tab">
+            <div class="ui blue button">Back to top</div>
+            <div style="background: #f6f6f6;" class="analytics3"></div>
+          </div>
+
+          <!-- Student Analytics -->
+          <div class="student tab">
+            Hi3
+          </div>
+
+        </div>
+      </div>
+
+      <!-- <div class="ui segment">
+        <div style="background: #f6f6f6;" class="analytics3"></div>
+        <br />
+        <div class="ui blue button">Back to top</div>
+      </div> -->
+
+      <div style="margin: 1em 0;" class="ui hidden section divider"></div>
+
+    </div>
+
+    <!-- General Script -->
+    <script>
+    $(function () {
+      tick(course);
+
+      $('.menu .item:not(.right)').on('click', function (e) {
+        e.preventDefault();
+        $('.menu .item').removeClass('active');
+        $(this).addClass('active');
+      });
+
+      $('.tab').hide();
+      $('.overview.tab').show();
+
+      $('.item.overview').on('click', function () {
+        $('.tab').hide();
+        $('.overview.tab').show();
+      });
+
+      $('.item.schedule').on('click', function () {
+        $('.tab').hide();
+        $('.schedule.tab').show();
+      });
+
+      $('.item.course').on('click', function () {
+        var url = '/course/{{overview.id}}';
+        // Socket push or ajax pull.
+        $.get(url, function (data) {
+          // console.log(data);
+          tick(data);
+          page_data = data;
+          $('.tab').hide();
+          $('.course.tab').show();
+        });
+      });
+
+      $('.item.student').on('click', function () {
+        $('.tab').hide();
+        $('.student.tab').show();
+      });
+
+    });
+
+    </script>
+
+    <!-- D3.js Script -->
+    <script>
+      var page_data = [];
+
+
+      $('.blue.button').on('click', function (e) {
+        e.preventDefault();
+        // data5.push({score: 4, correct: false, title: "Four" });
+        // data5[1].correct = false;
+        // data5[2].correct = true;
+        // data5[0].score = 5;
+        tick(page_data);
+      });
+
+      var course = [
+        { title: "Quiz 1", type: "Qui", score: 83, correct: false, down: [
+          { title: "Question 1", type: "Que", score: 50, correct: false, down: [
+            { title: "Response 1", type: "Res", score: 30, correct: false },
+            { title: "Response 2", type: "Res", score: 50, correct: false },
+            { title: "Response 3", type: "Res", score: 20, correct: false },
+            { title: "Response 4", type: "Res", score: 10, correct: false },
+            { title: "Response 5", type: "Res", score: 40, correct: true }
+          ]},
+          { title: "Question 2", type: "Que", score: 40, correct: false },
+          { title: "Question 3", type: "Que", score: 10, correct: false },
+          { title: "Question 4", type: "Que", score: 30, correct: false }
+        ]},
+        { title: "Quiz 2", type: "Qui", score: 34, correct: false },
+        { title: "Quiz 3", type: "Qui", score: 71, correct: false }
+      ];
+
+      var margin = {
+        top: 15,
+        right: 15,
+        bottom: 15,
+        left: 15
+      };
+      var width = $('.analytics3').width() - 40;
+      var barHeight = 30;
+      var height = 300;
+
+      var x = d3.scale.linear()
+        .domain([0, 100])
+        .range([0, width]);
+
+      var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient('bottom')
+        .ticks(5);
+
+      // Create SVG Canvas
+      var svg = d3.select('.analytics3').append('svg')
+        .attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom)
+        .attr('transform', 'translate('+ margin.left + ',' + margin.top + ')');
+
+      svg.append('g')
+        .attr('class', 'x axis');
+        // .attr('transform', 'translate(0,' + (barHeight) + ')')
+        // .call(xAxis);
+
+      svg.append('text')
+        .attr('class', 'label')
+        .attr('text-anchor', 'middle');
+        // .attr('transform', 'translate('+ (100) +','+ (barHeight) +')')
+        // .text('X-Axis');
+
+      function tick(data) {
+        console.log("tick");
+        if (typeof data[0] == "undefined") return;
+
+        // Update SVG ==========================================================
+        svg.attr('height', height + margin.top + margin.bottom);
+
+        svg.select('.x.axis')
+          .attr('transform', 'translate(0,' + (barHeight * data.length) + ')')
+          .call(xAxis);
+
+        svg.select('.label')
+          .attr('transform', 'translate('+ (width / 2) +','+ (barHeight * data.length + 35) +')')
+          .text(function () {
+            var type = data[0].type;
+            if (type == "Qui") { return "Avg. Score"; } else
+            if (type == "Que") { return "% Correct Reponses"; }
+            else               { return "% Chosen Reponses"; }
+          });
+
+        // JOIN Data ===========================================================
+        var bar = svg.selectAll('g.bar').data(data, function (d) { return d.title });
+
+        // EXIT ================================================================
+        bar.exit().remove();
+
+        // UPDATE ==============================================================
+        var updateBar = d3.transition(bar);
+
+        updateBar.select('rect')
+          .attr('fill', function (d) { return (d.correct ? "green" : "#006c94" ); })
+          .attr('width', function (d) { return x(d.score); });
+
+        updateBar.select('text')
+          .attr('x', function (d) { return 2; })
+          .text(function (d) { return d.title; });
+
+        // ENTER ===============================================================
+        var enterBar = bar.enter().append('g') // Bar container
+          .attr('class', 'bar')
+          .attr('transform', function (d, i) { return "translate(0, "+ i * barHeight +")"; });
+
+        enterBar.append('rect') // Actual bar
+          .attr('fill', function (d) { return (d.correct ? "green" : "#006c94" ); })
+          .attr('width', function (d) { return x(d.score); })
+          .attr('height', barHeight - 2)
+          .on('click', function (d, i) {
+            d3.event.stopPropagation();
+            var next = data.filter(function (elem, i) { return elem.title == d.title; });
+            if (next[0].down != []) {
+              tick(next[0].down);
+            } else {
+              console.log("You reached the bottom.");
+            }
+
+          });
+
+        enterBar.append('text')
+          .text(function (d) { return d.title; })
+          // .attr('text-anchor', 'end')
+          .attr('x', function (d) { return 2; })
+          .attr('y', barHeight / 2)
+          .attr('dy', "0.35em")
+          .each(wrap());
+      }
+      // tick(course);
+
+      // setInterval(function () {
+      //   data5.push({score: 4, correct: false, title: "Four" });
+      //   tick(data5)
+      // }, 1500);
+
+      // http://stackoverflow.com/questions/15975440/add-ellipses-to-overflowing-text-in-svg
+      function wrap(width, padding) {
+        return function () {
+          var self = d3.select(this);
+          var textLength = self.node().getComputedTextLength();
+          var text = self.text();
+          // console.log(textLength, text);
+
+        }
+      }
+
+
+    </script>
+
+    <!-- <script>
+
+      var data2 = [
+        {
+          score: 3,
+          title: "Question #1"
+        },
+        {
+          score: 6,
+          title: "Question #2"
+        }
+      ];
+
+      var data1 = [
+        {
+          score: 2,
+          title: "Quiz1"
+        },
+        {
+          score: 3,
+          title: "Quiz2"
+        },
+        {
+          score: 5,
+          title: "Quiz3"
+        },
+        {
+          score: 4,
+          title: "Quiz4"
+        },
+        {
+          score: 3,
+          title: "Quiz5"
+        },
+        {
+          score: 1,
+          title: "Quiz6"
+        }
+      ];
+
+      var data3 = [
+        {
+          score: 2,
+          title: "Response 1"
+        },
+        {
+          score: 3,
+          title: "Response 2"
+        },
+        {
+          score: 5,
+          title: "Response 3"
+        },
+        {
+          score: 4,
+          title: "Response 4"
+        },
+        {
+          score: 3,
+          title: "Response 5"
+        }
+      ];
+
+      var data = data1;
+
+      var margin = {
+        top: 20,
+        right: 40,
+        bottom: 30,
+        left: 60
+      };
+
+      var width = 400,
+          height = 300 - margin.top - margin.bottom;
+
+      var x = d3.scale.linear()
+        .range([0, width]);
+
+      var y = d3.scale.ordinal()
+        .rangeRoundBands([0, height], 0.1);
+
+      var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom")
+        .innerTickSize(-height);
+
+      var svg = d3.select(".analytics2").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        // .style("margin-left", -margin.left + "px")
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      svg.append("g")
+        .attr("class", "x axis");
+
+      svg.append("g")
+        .attr("class", "y axis")
+      .append("line")
+        .attr("class", "domain")
+        .attr("y2", height);
+
+      // Init or prep data here.
+
+      redraw(); // Call this "onclick"?
+
+      function redraw() {
+        console.log("Redraw");
+        y.domain(data.map(function (d) { return d.title; }));
+
+        xAxis.ticks(5);
+        x.domain([0, 5]);
+
+        var bar = svg.selectAll(".bar_container")
+          .data(data, function (d) { return d.title; });
+
+        // 1. Exit Transition
+        var exitTransition = d3.transition().duration(750).each(function () {
+          bar.exit().transition()
+            .attr("transform", function (d) { return "translate(0," + (d.y0 + height) + ")"; })
+            .style("fill-opacity", 0)
+            .remove();
+        });
+
+        // 2. Enter Transition
+        var enterTransition = exitTransition.transition().each(function () {
+          var barEnter = bar.enter().insert("g", ".axis")
+            .attr("class", "bar_container")
+            .attr("transform", function(d) { return "translate(0," + (y(d.title)) + ")"; })
+            .attr("fill-opacity", 1);
+
+          barEnter.append("rect")
+            .attr("class", "bar")
+            .attr("fill", "steelblue")
+            .attr("width", function (d) { return x(d.score); })
+            .attr("height", y.rangeBand())
+            .on("click", function (d, i) {
+              d3.event.stopPropagation();
+              switch (data) {
+                case data1:
+                  data = data2;
+                  break;
+                case data2:
+                  data = data3;
+                  break;
+                case data3:
+                  data = data1;
+                  break;
+                default:
+                  data = data1;
+              }
+              redraw();
+              // alert(d.title);
+            });
+
+          barEnter.append("text")
+            .attr("class", "label")
+            .attr("x", -3)
+            .attr("y", y.rangeBand() / 2)
+            .attr("dy", ".35em")
+            .attr("text-anchor", "end")
+            .text(function(d) { return d.title; });
+
+          barEnter.append("text")
+            .attr("class", "value")
+            .attr("x", function(d) { return x(d.score) - 3; })
+            .attr("y", y.rangeBand() / 2)
+            .attr("dy", ".35em")
+            .attr("text-anchor", "end")
+            .text(function(d) { return d.score; });
+
+          barEnter.transition().duration(750);
+        });
+
+
+
+
+        // var barUpdate = d3.transition(bar)
+        //   .attr("transform", function(d) { return "translate(0," + (d.y0 = y(d.score)) + ")"; })
+        //   .style("fill-opacity", 1);
+        //
+        // barUpdate.select("rect")
+        //   .attr("width", function(d) { return x(d.score); });
+        //
+        // barUpdate.select(".value")
+        //   .attr("x", function(d) { return x(d.score) - 3; });
+        //   // .text(function(d) { return format(d.score]); });
+
+        // var barExit = bar.exit().transition() //d3.transition(bar.exit())
+        //   .duration(2000)
+        //   .attr("transform", function (d) { return "translate(0," + (d.y0 + height) + ")"; })
+        //   .style("fill-opacity", 0)
+        //   .remove();
+
+        d3.transition(svg).select(".x.axis")
+          .attr("transform", "translate(0," + (height) + ")")
+          .call(xAxis);
+
+        svg.selectAll(".tick text").attr("dy", "1.7em");
+
+      }
+
+    </script> -->
+
+  </body>
+</html>

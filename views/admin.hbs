@@ -1,0 +1,42 @@
+<html>
+<head>
+  <style>
+    table {
+      border-collapse: collapse;
+    }
+    td {
+      padding: 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div>
+  <form method='post' action='admin' enctype="multipart/form-data">
+  <input type='file' name='spreadsheet'>
+  <br />
+  <input type='submit' value="Upload">
+</div>
+
+<div>
+  <table>
+      <tr>
+        <th>Course</th>
+        <th>Quiz</th>
+        <th>Remove</th>
+      </tr>
+    {{#each courses}}
+      <tr>
+        <td><a href="/course/{{this.Course_id}}">{{this.Course}}</a></td>
+        <td><a href="/quiz/{{this.Quiz_id}}">{{this.Quiz}}</a></td>
+        <td><a href="/admin/delete?quiz={{this.Quiz_id}}">Delete Quiz</a></td>
+      </tr>
+    {{/each}}
+  </table>
+</div>
+
+
+
+</body>
+</html>

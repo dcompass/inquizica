@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<!-- TODO: Timer on flip cards -->
+<html lang="en">
+  <head>
+    <title>Inquizica: the intuitive learning platform</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="Distributed Practice Testing platform and analytics." />
+    <meta name="keywords" content="education, learning" />
+    <meta name="author" content="Sean Lynch" />
+    <link rel="icon" type="image/png" href="/public/img/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/public/img/favicon-16x16.png" sizes="16x16">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <script src="https://npmcdn.com/jquery@3.1.0/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.4/semantic.min.css" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.4/semantic.min.js"></script>
+
+    <script type="text/javascript" src="../public/javascripts/bodymovin.js"></script>
+    <link rel="stylesheet" href="../public/css/menu_masthead_hero.css" />
+    <script type="text/javascript" src="../public/javascripts/menu_masthead.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans|Oswald:300|Bitter|Roboto|Raleway:500, 400i" rel="stylesheet">
+    <style>
+      .masthead {
+        width: 100%;
+        background-image: url('../public/img/bg_pattern_01.png') !important;
+        background-size: cover !important;
+        background-position: center center;
+        background-repeat: no-repeat;
+        /*background: #006B94 !important;*/
+      }
+      #logo {
+        font-family: 'Bitter', serif;
+        font-size: 1.65em;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
+      #big_logo {
+        font-family: 'Bitter', serif;
+        font-size: 3.5em;
+        padding-top: 5px;
+        padding-bottom: 10px;
+      }
+
+      p {
+        font-family: 'Roboto', sans-serif;
+      }
+      .ui.green.card {
+        background: #f7f7f7;
+      }
+
+      .feature_header {
+        font-family: 'Oswald', sans-serif !important;
+        font-size: 2.5em !important;
+        margin-top: 0 !important;
+        color: white !important;
+      }
+
+      .content p {
+        font-family: 'Roboto', sans-serif !important;
+        font-size: 1.25em !important;
+        line-height: normal !important;
+        /*color: #e0e0e0 !important;*/
+        opacity: 0.8 !important;
+      }
+
+      .para {
+        width: 500px;
+      }
+
+      .card {
+        background-color: #f7f7f7 !important;
+        height: 75% !important;
+        box-shadow: none !important;
+      }
+
+      .card .content .header {
+        font-size: 1.75em !important;
+      }
+
+      .card .content .meta {
+        margin-bottom: 1.5em;
+      }
+
+      .card .content .description {
+        margin-bottom: 0.5em;
+        font-size: 1.25em !important;
+      }
+
+      .card .extra.content {
+        background-color: #38B549 !important;
+      }
+
+      .card .extra.content span {
+        color: white !important;
+      }
+
+    </style>
+
+  </head>
+  <body>
+    {{> navMenu }}
+
+    <!-- Page Contents -->
+    <div class="pusher">
+
+      <!-- Menu & Such -->
+      <div class="ui inverted vertical masthead center aligned segment">
+
+        <!-- Main Header Menu -->
+        <div class="ui container">
+          <div class="ui large secondary inverted pointing menu">
+            <!-- <div class="item">
+              <img src="/public/img/favicon.png">
+            </div> -->
+            <div id="logo" class="header item">Inquizica</div>
+            <a class="toc item">
+              <i class="sidebar icon"></i>
+            </a>
+            <!-- {{#if user}}
+              <a href="/courses" class="item">Courses</a>
+            {{else}}
+              <a href="/login?redirectmsg=But please sign in to see our courses&redirectheader=We can see your eager to get started!" class="item">Courses</a>
+            {{/if}}
+            <a href="/about" class="item">About</a> -->
+            <div class="right item">
+              {{#if user}}
+                <a href="/account" class="ui inverted button">Account</a>
+                <!-- <a href="/courses" class="ui inverted button">Courses</a> -->
+                <a href="/logout" class="ui inverted red button">Log out</a>
+              {{else}}
+                <a href="/signup" class="ui inverted button">Sign up</a>
+                <a href="/login" class="ui inverted button">Log in</a>
+                <!-- <a href="#about" class="ui inverted button">About</a> -->
+              {{/if}}
+            </div>
+          </div>
+        </div>
+
+        <!-- Error/Redirect Message  -->
+        <div id="redirect-msg" class="ui floating compact warning message" style="display:none; width:400px !important; position:absolute; margin-left: -200px; left: 50%; top: 3em; z-index:10; ">
+          <i class="close icon"></i>
+          <div class="header h"></div>
+          <p class="b"></p>
+        </div>
+
+        <!-- "Prices" -->
+        <div style="margin-top: 7em;" class="ui container">
+          <div style="width: 70%; margin: 0 auto;" class="ui two stackable link cards">
+
+            <div class="ui centered card once">
+              <!-- <div class="image">
+                <img src="/images/avatar2/large/matthew.png">
+              </div> -->
+              <div class="content">
+                <div class="header">Try One Now</div>
+                <div class="meta">Trivia</div>
+                <div class="description">
+                  Take a sample quiz right now.
+                </div>
+              </div>
+              <div class="extra content">
+                <span class="center aligned">Free</span>
+              </div>
+            </div>
+
+            <!-- <div class="ui centered card week">
+              <div class="image">
+                <img src="/images/avatar2/large/molly.png">
+              </div>
+              <div class="content">
+                <div class="header">Try Five Days</div>
+                <div class="meta">AP Biology</div>
+                <div class="description">
+                  Receive quizzes over five days.
+                </div>
+                <div class="description">
+                  Experience distributed practice testing.
+                </div>
+              </div>
+              <div class="extra content">
+                <span class="center aligned">Free</span>
+              </div>
+            </div> -->
+
+            <div class="ui centered card signup">
+              <!-- <div class="image">
+                <img src="/images/avatar2/large/elyse.png">
+              </div> -->
+              <div class="content">
+                <div class="header">Sign up for Course</div>
+                <div class="meta">Renal Physiology</div>
+                <div class="description">
+                  Get access to entire courses.
+                </div>
+                <div class="description">
+                  Move at your own pace.
+                </div>
+                <div class="description">
+                  Review your progress.
+                </div>
+              </div>
+              <div class="extra content">
+                <span class="center aligned">Free</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div  class="ui small modal">
+        <div class="ui icon header">
+          <i class="mail icon"></i>
+          Select Delivery Method
+        </div>
+        <div stlye="color: black !important;" class="content">
+          <p>Would you like us to send the quiz to your phone through email or SMS? You will only be messaged once.</p>
+        </div>
+        <div class="actions">
+          <div class="ui green cancel inverted button">
+            <i class="at icon"></i>
+            Email
+          </div>
+          <div class="ui green ok inverted button">
+            <i class="mobile icon"></i>
+            Phone
+          </div>
+          <div class="ui emailField input" hidden>
+            <input placeholder="email" type="text" hidden />
+          </div>
+          <div class="ui phoneField input" hidden>
+            <input placeholder="phone" type="text" hidden />
+          </div>
+          <div class="ui green inverted ok finished button" style="display: none;">
+            <i class="check icon"></i>
+            Submit
+          </div>
+        </div>
+      </div>
+
+      {{> footer}}
+    </div>
+  <script src="../public/javascripts/redirectmsg.js"></script>
+  <script>
+
+    $(function () {
+      $('.card.once').on('click', function (e) {
+        $('.ui.small.modal').modal({
+          onDeny: function () {
+            $('.ui.modal .actions .ok.button').hide();
+            $('.ui.modal .actions .cancel.button').hide();
+            $('.ui.modal .actions .finished.button').show();
+
+            $('.ui.modal .actions .emailField').show();
+            $('.ui.modal .actions .emailField input').show();
+            $('.ui.modal .actions .phoneField input').val('');
+            $('.ui.modal .actions .emailField input').val('');
+            return false;
+          },
+          onApprove: function (e) {
+            if (e.hasClass('finished')) {
+              $('ui.small.modal').modal('hide');
+              var output = $('.ui.modal .actions .emailField input').val()
+                        || $('.ui.modal .actions .phoneField input').val();
+              alert(output);
+              // AJAX HERE
+            } else {
+              $('.ui.modal .actions .ok.button').hide();
+              $('.ui.modal .actions .cancel.button').hide();
+              $('.ui.modal .actions .finished.button').show();
+
+              $('.ui.modal .actions .phoneField').show();
+              $('.ui.modal .actions .phoneField input').show();
+              $('.ui.modal .actions .phoneField input').val('');
+              $('.ui.modal .actions .emailField input').val('');
+              return false;
+            }
+
+          }
+        }).modal('show');
+      });
+
+      // $('.card.week').on('click', function (e) {
+      //   alert("week");
+      // });
+
+
+
+      $('.card.signup').on('click', function (e) {
+        window.location.href = "/signup?code=ABC123";
+      });
+
+      $('.ui.dropdown').dropdown();
+
+      $('.start_trial').on('click', function (e) {
+        e.preventDefault();
+        var regEx = /\d{10}/;
+        var courseCode = $('.trial .selected').attr('value');
+        var phoneNumber = $('.trial_number').val();
+        var validPhoneNum = regEx.test(phoneNumber) && (regEx.exec(phoneNumber) !== null) && (phoneNumber.length == 10);
+        if (typeof courseCode == 'undefined') {
+          // Bad choice of course
+          alert("Please select a sample course.");
+        } else if (!validPhoneNum) {
+          // Bad Phone Number
+          alert("Please use just the ten digits. No spaces, dashes or other characters.");
+        } else {
+          // All good to send.
+          var pack = {
+            course: courseCode,
+            phone: regEx.exec(phoneNumber)[0]
+          };
+          $.post("/promo", pack, function (res) {
+            window.location.href = '/?redirectheader=Success!&redirectmsg=Thanks%20for%20trying%20out%20Inquizica!';
+            console.log(res);
+          });
+        }
+      });
+
+      // If on mobile....
+      if (window.matchMedia( "(max-width: 767px)" ).matches) {
+        $('.svg_container').html('<div id="big_logo">Inquizica</div>');
+        $('.right_header').css('font-size', "2.25em");
+        $('.trial_number').css('width', '150px');
+        $('.ten.wide.column .content p').removeClass('para');
+      }
+    });
+  </script>
+  </body>
+</html>
