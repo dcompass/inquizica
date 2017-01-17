@@ -225,21 +225,64 @@ router.get('/course/:id/topics', function (req, res, next) {
 });
 
 router.put('/course/:id/user', function (req, res, next) {
-  res.status(500).end();
+  Course.exists(req.params.id).then(function (check) { // 1
+      if (check == 1) {
+        User.exists(req.query.id).then(function (check2) { // 2
+            if (check2 == 1) {
+              Course.getQuizzes(req.params.id).then(function (data) { // 3
+                  var arr = (new Array(data.length)).fill(0);
+                  Course.addUser(req.params.id, req.query.id, arr) // 4
+                    .then(function (resp) {
+                      res.status(200).end(); // DONE.
+                    }).catch(function (err) { res.status(501).end(); });
+                }).catch(function (err) { res.status(501).end(); });
+            } else { res.status(404).end(); }
+          }).catch(function (err) { res.status(501).end(); });
+      } else { res.status(404).end(); }
+    }).catch(function (err) { res.status(501).end(); });
 });
 
 router.put('/course/:id/quiz', function (req, res, next) {
-  res.status(500).end();
+  Course.exists(req.params.id).then(function (check) {
+      if (check == 1) {
+        Quiz.exists(req.query.id).then(function (check2) {
+            if (check2 == 1) {
+              Course.addQuiz(req.params.id, req.query.id, req.query.index, req.query.queue, req.query.date)
+                .then(function (data) {
+                  res.status(200).end();
+                }).catch(function (err) { console.log("A", err); res.status(501).end(); });
+            } else { res.status(404).end(); }
+          }).catch(function (err) { console.log("A", err); res.status(501).end(); });
+      } else { res.status(404).end(); }
+    }).catch(function (err) { console.log("B", err); res.status(501).end(); });
 });
 
 // =================================================
 
-router.post('/quiz/', function (req, res, next) {
-  res.status(500).end("No");
+router.post('/quiz/', jsonParser, function (req, res, next) {
+  Quiz.newQuiz(req.body)
+    .then(function (data) {
+      res.set('location', '/');
+      res.status(301).end();
+    })
+    .catch(function (err) {
+      res.status(400).end();
+    });
 });
 
 router.get('/quiz/:id', function (req, res, next) {
-  res.status(500).end("No");
+  Quiz.getQuiz(req.params.id)
+    .then(function (data) {
+      if (data.length > 0) {
+        res.status(200).json(data[0]);
+      } else {
+        res.status(404).json({});
+      }
+    })
+    .catch(function (err) {
+      console.log(err);
+      res.status(500).end("No");
+    })
 });
 
 router.put('/quiz/:id', function (req, res, next) {
@@ -247,7 +290,23 @@ router.put('/quiz/:id', function (req, res, next) {
 });
 
 router.delete('/quiz/:id', function (req, res, next) {
-  res.status(500).end("No");
+  Quiz.exists(req.params.id)
+    .then(function (data) {
+      if (data == 1) {
+        Quiz.deleteQuiz(req.params.id)
+          .then(function (data) {
+            res.status(200).end();
+          })
+          .catch(function (err) {
+            res.status(501).end();
+          });
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch(function (err) {
+      res.status(501).end();
+    });
 });
 
 // =================================================

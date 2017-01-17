@@ -34,6 +34,16 @@ exports.seed = function(knex, Promise) {
         affiliation: "Inquizica",
         type: 2
       }),
+      knex('user').insert({
+        id: 3,
+        firstname: "Sheen",
+        lastname: "Mynch",
+        phone: "123-456-7890",
+        email: "sheen@gmail.com",
+        password: "admin",
+        affiliation: "Inquizica",
+        type: 3
+      }),
       knex('course').insert({
         id: 1,
         title: "Biology 101",
@@ -52,6 +62,11 @@ exports.seed = function(knex, Promise) {
         id: 1,
         title: "Quiz #1",
         author: "Sean"
+      }),
+      knex('quiz').insert({
+        id: 2,
+        title: "Quiz #2",
+        author: "Shawn"
       }),
       knex('user_course').insert({
         user_id: 1,

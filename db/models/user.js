@@ -53,6 +53,13 @@ function getCourses(user_id) {
   });
 }
 
+function exists(user_id) {
+  return knex.raw("select exists(select 1 from USER where id = ?) as exists_check;", user_id)
+    .then(function (resp) {
+      return resp[0][0].exists_check;
+    });
+}
+
 module.exports = {
   getUser: read,
   newUser: create,
@@ -60,5 +67,6 @@ module.exports = {
   deleteUser: destroy,
   getProg: getProgression,
   updateProg: updateProgression,
-  getCourses: getCourses
+  getCourses: getCourses,
+  exists: exists
 }

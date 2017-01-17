@@ -1,12 +1,14 @@
 process.env.NODE_ENV = 'test';
 
 var async = require('async');
+var moment = require('moment');
 var knex = require('../db/knex.js');
 var expect = require("chai").expect;
 var request = require('supertest');
 var app = require('../app.js');
 var student = request.agent(app);
 var teacher = request.agent(app);
+var admin = request.agent(app);
 
 // TODO: API Authentication in general.
 // TODO: More specific expect() statements all over.
@@ -179,6 +181,7 @@ describe('API Controller:', function () {
           done();
         });
     });
+    // TODO: Add tests for "exists".
   });
 
   describe("Auth", function () {
@@ -345,7 +348,6 @@ describe('API Controller:', function () {
           done();
         });
     });
-
     // it('[GET /course/:id/topics] should issue 200 OKAY with json for existing course', function (done) {
     //   request(app)
     //     .get('/api/course/1/topics')
@@ -366,83 +368,133 @@ describe('API Controller:', function () {
     //       done();
     //     });
     // });
-    //
-    // it('[PUT /course/:id/user] should issue 200 OKAY for existing course', function (done) {
-    //   request(app)
-    //     .put('/api/course/1/user')
-    //     .send({})
-    //     .expect(200)
-    //     .end(function (err, res) {
-    //       if (err) return done(err);
-    //       done();
-    //     });
-    // });
-    // it('[PUT /course/:id/user] should issue 404 NOT FOUND for non-existant course', function (done) {
-    //   request(app)
-    //     .put('/api/course/1/user')
-    //     .send({})
-    //     .expect(404)
-    //     .end(function (err, res) {
-    //       if (err) return done(err);
-    //       done();
-    //     });
-    // });
-    //
-    // it('[PUT /course/:id/quiz] should issue 200 OKAY for existing course', function (done) {
-    //   request(app)
-    //     .put('/api/course/1/quiz')
-    //     .send({})
-    //     .expect(200)
-    //     .end(function (err, res) {
-    //       if (err) return done(err);
-    //       done();
-    //     });
-    // });
-    // it('[PUT /course/:id/quiz] should issue 404 NOT FOUND for non-existant course', function (done) {
-    //   request(app)
-    //     .put('/api/course/919191/quiz')
-    //     .send({})
-    //     .expect(404)
-    //     .end(function (err, res) {
-    //       if (err) return done(err);
-    //       done();
-    //     });
-    // });
-
+    it('[PUT /course/:id/user] should issue 200 OKAY for existing course', function (done) {
+      request(app)
+        .put('/api/course/1/user?id=2')
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
+          done();
+        });
+    });
+    it('[PUT /course/:id/user] should issue 404 NOT FOUND for non-existant course', function (done) {
+      request(app)
+        .put('/api/course/919191/user?id=2')
+        .expect(404)
+        .end(function (err, res) {
+          if (err) return done(err);
+          done();
+        });
+    });
+    // TODO: Add tests for "exists".
+    it('[PUT /course/:id/quiz] should issue 200 OKAY for existing course', function (done) {
+      var some_date = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+      var url = '/api/course/1/quiz?id=2&index=0&queue=0&date=' + encodeURIComponent(some_date);
+      request(app)
+        .put(url)
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
+          done();
+        });
+    });
+    it('[PUT /course/:id/quiz] should issue 404 NOT FOUND for non-existant course', function (done) {
+      var some_date = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+      var url = '/api/course/919191/quiz?id=2&index=0&queue=0&date=' + encodeURIComponent(some_date);
+      request(app)
+        .put(url)
+        .expect(404)
+        .end(function (err, res) {
+          if (err) return done(err);
+          done();
+        });
+    });
+    // TODO: Add test for both exists checks.
   });
 
+  describe("Quiz", function () {
+    it("[POST /quiz] should issue 301 REDIRECT on success", function (done) {
+      var quiz1 = {
+        title: "Quiz #3",
+        author: "Pynch"
+      };
+      request(app)
+        .post('/api/quiz')
+        .send(quiz1)
+        .expect(301)
+        .end(function (err) {
+          if (err) return done(err);
+          done();
+        });
+    });
+    it("[POST /quiz] should issue 400 BAD REQ on incomplete form data", function (done) {
+      var quiz2 = {
+        // No title
+        author: "Pynch"
+      };
+      request(app)
+        .post('/api/quiz')
+        .send(quiz2)
+        .expect(400)
+        .end(function (err) {
+          if (err) return done(err);
+          done();
+        });
+    });
+    it("[GET /quiz/:id] should issue 200 OKAY with json for existing user", function (done) {
+      request(app)
+        .get('/api/quiz/1')
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
+          expect(res.body).to.be.json;
+          done();
+        });
+    });
+    it("[GET /quiz/:id] should issue 404 NOT FOUND with json for non-existant user", function (done) {
+      request(app)
+        .get('/api/quiz/717171')
+        .expect(404)
+        .end(function (err, res) {
+          if (err) return done(err);
+          expect(res.body).to.be.json;
+          done();
+        });
+    });
+    it("[DELETE /quiz/:id] should issue 200 OKAY ", function (done) {
+      request(app)
+        .delete('/api/quiz/2')
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
+          done();
+        });
+    });
+    it("[DELETE /quiz/:id] should issue 404 NOT FOUND ", function (done) {
+      request(app)
+        .delete('/api/quiz/717171')
+        .expect(404)
+        .end(function (err, res) {
+          if (err) return done(err);
+          done();
+        });
+    });
+
+    it("[GET /quiz/:id/analytics] should issue 200 OKAY ");
+    it("[GET /quiz/:id/analytics] should issue 404 NOT FOUND ");
+    it("[GET /quiz/:id/questions] should issue 200 OKAY ");
+    it("[GET /quiz/:id/questions] should issue 404 NOT FOUND ");
+    it("[PUT /quiz/:id/question] should issue 200 OKAY ");
+    it("[PUT /quiz/:id/question] should issue 404 NOT FOUND ");
+    it("[POST /quiz/:id/record] should issue 200 OKAY ");
+    it("[POST /quiz/:id/record] should issue 404 NOT FOUND ");
+  });
 
   // describe('Quiz', function () {
-  //   it("should CREATE a new quiz", function (done) {
-  //     request(app)
-  //       .post('/quiz')
-  //       .expect(200)
-  //       .end(function (err, res) {
-  //         if (err) return done(err);
-  //         done();
-  //       });
-  //   });
-  //   it("should READ a given quiz", function (done) {
-  //     request(app)
-  //       .get('/quiz/3')
-  //       .expect(200)
-  //       .end(function (err, res) {
-  //         if (err) return done(err);
-  //         done();
-  //       });
-  //   });
+
   //   it("should UPDATE a given quiz", function (done) {
   //     request(app)
   //       .put('/quiz/3')
-  //       .expect(200)
-  //       .end(function (err, res) {
-  //         if (err) return done(err);
-  //         done();
-  //       });
-  //   });
-  //   it("should DESTROY a given quiz", function (done) {
-  //     request(app)
-  //       .delete('/quiz/3')
   //       .expect(200)
   //       .end(function (err, res) {
   //         if (err) return done(err);
@@ -563,6 +615,18 @@ describe("View Controller:", function () {
             console.log("   teacher logged in");
             callback();
           });
+      },
+      function (callback) {
+        admin
+          .post('/api/auth/login')
+          .send({email: 'sheen@gmail.com', passwd: 'admin' })
+          .expect(302)
+          .end(function (err, res) {
+            if (err) return callback(err);
+            expect(res.headers['location']).to.equal('/account');
+            console.log("   admin logged in");
+            callback();
+          });
       }],
       function (err, results) {
         if (err) console.log(err);
@@ -589,6 +653,16 @@ describe("View Controller:", function () {
           .end(function (err, res) {
             if (err) return callback(err);
             console.log("   teacher logged out");
+            callback();
+          });
+      },
+      function (callback) {
+        admin
+          .post('/api/auth/logout')
+          .expect(301)
+          .end(function (err, res) {
+            if (err) return callback(err);
+            console.log("   admin logged out");
             callback();
           });
       }],
@@ -638,6 +712,15 @@ describe("View Controller:", function () {
           done();
         });
     });
+    it("[GET /] should send 200 for admins", function (done) {
+      admin
+        .get('/')
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
+          done();
+        });
+    });
   });
 
   describe("Demo Page", function () {
@@ -664,6 +747,15 @@ describe("View Controller:", function () {
         .get('/demos')
         .expect(200)
         .end(function (err) {
+          if (err) return done(err);
+          done();
+        });
+    });
+    it("[GET /demos] should send 200 for admins", function (done) {
+      admin
+        .get('/demos')
+        .expect(200)
+        .end(function (err, res) {
           if (err) return done(err);
           done();
         });
@@ -763,6 +855,15 @@ describe("View Controller:", function () {
           done();
         });
     });
+    it("[GET /account] should send 200 for admins", function (done) {
+      admin
+        .get('/account')
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
+          done();
+        });
+    });
   });
 
   describe("Course Dashboard/Page", function () {
@@ -786,6 +887,15 @@ describe("View Controller:", function () {
     });
     it("[GET /course/:id] should issue 200 for teachers", function (done) {
       teacher
+        .get('/course/1')
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
+          done();
+        });
+    });
+    it("[GET /course/:id] should send 200 for admins", function (done) {
+      admin
         .get('/course/1')
         .expect(200)
         .end(function (err, res) {
@@ -823,6 +933,15 @@ describe("View Controller:", function () {
           done();
         });
     });
+    it("[GET /quiz/:id] should send 200 for admins", function (done) {
+      admin
+        .get('/quiz/1')
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
+          done();
+        });
+    });
   });
 
   describe("Scheduler Page", function () {
@@ -846,6 +965,15 @@ describe("View Controller:", function () {
     });
     it("[GET /scheduler] should issue 200 for teachers", function (done) {
       teacher
+        .get('/scheduler')
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
+          done();
+        });
+    });
+    it("[GET /scheduler] should send 200 for admins", function (done) {
+      admin
         .get('/scheduler')
         .expect(200)
         .end(function (err, res) {
@@ -879,6 +1007,15 @@ describe("View Controller:", function () {
         .get('/admin')
         .expect(403)
         .end(function (err) {
+          if (err) return done(err);
+          done();
+        });
+    });
+    it("[GET /admin] should send 200 for admins", function (done) {
+      admin
+        .get('/admin')
+        .expect(200)
+        .end(function (err, res) {
           if (err) return done(err);
           done();
         });
