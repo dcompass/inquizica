@@ -29,11 +29,14 @@ describe('API Controller:', function () {
   });
 
   afterEach(function (done) {
-    setTimeout(done(), 1100);
+    knex.migrate.rollback()
+      .then(function () {
+        done();
+      });
   });
 
   describe('User', function () {
-    it("[POST /user] should issue 303 SEE OTHER redirect on success", function (done) {
+    it("[POST /user] should issue [303 SEE OTHER] redirect on success", function (done) {
       var user = {
         firstname: "Sean",
         lastname: "Lynch",
@@ -53,7 +56,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it("[POST /user] should issue 400 BAD REQ on incomplete form data", function (done) {
+    it("[POST /user] should issue [400 BAD REQ] on incomplete form data", function (done) {
       var user2 = {
         firstname: "Sean",
         lastname: "Lynch",
@@ -74,7 +77,7 @@ describe('API Controller:', function () {
         });
     });
     // TODO: Check all fields are present.
-    it('[GET /user/:id] should issue 200 OKAY with json for existing user', function (done) {
+    it('[GET /user/:id] should issue [200 OKAY] with json for existing user', function (done) {
       request(app)
         .get('/api/user/1')
         .expect(200)
@@ -84,7 +87,7 @@ describe('API Controller:', function () {
           done();
         });
     })
-    it('[GET /user/:id] should issue 404 NOT FOUND with json if user does not exist', function (done) {
+    it('[GET /user/:id] should issue [404 NOT FOUND] with json if user does not exist', function (done) {
       request(app)
         .get('/api/user/919191')
         .expect(404)
@@ -96,7 +99,7 @@ describe('API Controller:', function () {
     })
     // TODO: Implement UPDATE operations.
     // TODO: Should tests if delete deletes all related entires.
-    it('[DELETE /user/:id] should issue 200 OKAY for existing user', function (done) {
+    it('[DELETE /user/:id] should issue [200 OKAY] for existing user', function (done) {
       request(app)
         .delete('/api/user/1')
         .expect(200)
@@ -105,7 +108,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[DELETE /user/:id] should issue 404 NOT FOUND if user does not exist', function (done) {
+    it('[DELETE /user/:id] should issue [404 NOT FOUND] if user does not exist', function (done) {
       request(app)
         .delete('/api/user/919191')
         .expect(404)
@@ -114,7 +117,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[GET /user/:id/progression] should issue 200 OKAY with json on success', function (done) {
+    it('[GET /user/:id/progression] should issue [200 OKAY] with json on success', function (done) {
       request(app)
         .get('/api/user/1/progression?course=1')
         .expect(200)
@@ -125,7 +128,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[GET /user/:id/progression] should issue 404 NOT FOUND with json if user/course does not exist ', function (done) {
+    it('[GET /user/:id/progression] should issue [404 NOT FOUND] with json if user/course does not exist ', function (done) {
       request(app)
         .get('/api/user/1/progression?course=818181')
         .expect(404)
@@ -136,7 +139,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[PUT /user/:id/progression] should issue 200 OKAY when updated successfully', function (done) {
+    it('[PUT /user/:id/progression] should issue [200 OKAY] when updated successfully', function (done) {
       request(app)
         .put('/api/user/1/progression?course=1')
         .send({progression: [1, 1, 0, 0] })
@@ -147,7 +150,7 @@ describe('API Controller:', function () {
         });
     });
     // TODO: Should check existence of user/course better.
-    it('[PUT /user/:id/progression] should issue 404 NOT FOUND if user does not exist', function (done) {
+    it('[PUT /user/:id/progression] should issue [404 NOT FOUND] if user does not exist', function (done) {
       request(app)
         .put('/api/user/919191/progression?course=1')
         .send({progression: [1, 1, 0, 0] })
@@ -159,7 +162,7 @@ describe('API Controller:', function () {
     });
     // TODO: Implement "next", .get('/user/1/next?quiz=1')
     // it('[GET /user/:id/next] should issue 200 with json on success');
-    it("[GET /user/:id/courses] should issue 200 OKAY with json when successful", function (done) {
+    it("[GET /user/:id/courses] should issue [200 OKAY] with json when successful", function (done) {
       request(app)
         .get('/api/user/1/courses')
         .expect(200)
@@ -170,7 +173,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it("[GET /user/:id/courses] should issue 404 NOT FOUND with json when user does not exist", function (done) {
+    it("[GET /user/:id/courses] should issue [404 NOT FOUND] with json when user does not exist", function (done) {
       request(app)
         .get('/api/user/818181/courses')
         .expect(404)
@@ -186,7 +189,7 @@ describe('API Controller:', function () {
 
   describe("Auth", function () {
     // TODO: SALT AND HASH PASSWORDS!!!!
-    it('[GET /account] should issue 403 when user is not logged in', function (done) {
+    it('[GET /account] should issue [403 FORBIDDEN] when user is not logged in', function (done) {
       student
         .get('/account')
         .expect(403)
@@ -206,7 +209,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[GET /account] should issue 200 when user is logged in', function (done) {
+    it('[GET /account] should issue [200 OKAY] when user is logged in', function (done) {
       student
         .get('/account')
         .expect(200)
@@ -224,7 +227,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[GET /account] should issue 403 after user is logged out', function (done) {
+    it('[GET /account] should issue [403 FORBIDDEN] after user is logged out', function (done) {
       student
         .get('/account')
         .expect(403)
@@ -253,7 +256,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[POST /course] should issue 400 bad request on incomplete form data', function (done) {
+    it('[POST /course] should issue [400 BAD REQ] on incomplete form data', function (done) {
       var course_data = {
         // title missing
         description: "Medical school level course",
@@ -269,7 +272,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[GET /course/:id] should issue 200 with json for exsiting course', function (done) {
+    it('[GET /course/:id] should issue [200 OKAY] with json for exsiting course', function (done) {
       request(app)
         .get('/api/course/1')
         .expect(200)
@@ -279,7 +282,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[GET /course/:id] should issue 404 with json if course does not exist', function (done) {
+    it('[GET /course/:id] should issue [404 NOT FOUND] with json if course does not exist', function (done) {
       request(app)
         .get('/api/course/919191')
         .expect(404)
@@ -290,7 +293,7 @@ describe('API Controller:', function () {
         });
     });
     // TODO: Check that delete cascades to delete everything related as well.
-    it('[DELETE /course/:id] should issue 200 OKAY for existing course', function (done) {
+    it('[DELETE /course/:id] should issue [200 OKAY] for existing course', function (done) {
       request(app)
         .delete('/api/course/2')
         .expect(200)
@@ -299,7 +302,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[DELETE /course/:id] should issue 404 NOT FOUND for non-existant course', function (done) {
+    it('[DELETE /course/:id] should issue [404 NOT FOUND] for non-existant course', function (done) {
       request(app)
         .delete('/api/course/818181')
         .expect(404)
@@ -308,7 +311,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[GET /course/:id/quizzes] should issue 200 OKAY with json for existing course', function (done) {
+    it('[GET /course/:id/quizzes] should issue [200 OKAY] with json for existing course', function (done) {
       request(app)
         .get('/api/course/1/quizzes')
         .expect(200)
@@ -318,7 +321,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[GET /course/:id/quizzes] should issue 404 NOT FOUND with json for non-existant course', function (done) {
+    it('[GET /course/:id/quizzes] should issue [404 NOT FOUND] with json for non-existant course', function (done) {
       request(app)
         .get('/api/course/818181/quizzes')
         .expect(404)
@@ -328,7 +331,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[GET /course/:id/schedule] should issue 200 OKAY with json for existing course', function (done) {
+    it('[GET /course/:id/schedule] should issue [200 OKAY] with json for existing course', function (done) {
       request(app)
         .get('/api/course/1/schedule')
         .expect(200)
@@ -338,7 +341,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[GET /course/:id/schedule] should issue 404 NOT FOUND with json for non-existant course', function (done) {
+    it('[GET /course/:id/schedule] should issue [404 NOT FOUND] with json for non-existant course', function (done) {
       request(app)
         .get('/api/course/818181/schedule')
         .expect(404)
@@ -348,7 +351,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    // it('[GET /course/:id/topics] should issue 200 OKAY with json for existing course', function (done) {
+    // it('[GET /course/:id/topics] should issue [200 OKAY] with json for existing course', function (done) {
     //   request(app)
     //     .get('/api/course/1/topics')
     //     .expect(200)
@@ -358,7 +361,7 @@ describe('API Controller:', function () {
     //       done();
     //     });
     // });
-    // it('[GET /course/:id/topics] should issue 404 NOT FOUND with json for non-existant course', function (done) {
+    // it('[GET /course/:id/topics] should issue [404 NOT FOUND] with json for non-existant course', function (done) {
     //   request(app)
     //     .get('/api/course/818181/topics')
     //     .expect(404)
@@ -368,7 +371,7 @@ describe('API Controller:', function () {
     //       done();
     //     });
     // });
-    it('[PUT /course/:id/user] should issue 200 OKAY for existing course', function (done) {
+    it('[PUT /course/:id/user] should issue [200 OKAY] for existing course', function (done) {
       request(app)
         .put('/api/course/1/user?id=2')
         .expect(200)
@@ -377,7 +380,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[PUT /course/:id/user] should issue 404 NOT FOUND for non-existant course', function (done) {
+    it('[PUT /course/:id/user] should issue [404 NOT FOUND] for non-existant course', function (done) {
       request(app)
         .put('/api/course/919191/user?id=2')
         .expect(404)
@@ -387,7 +390,7 @@ describe('API Controller:', function () {
         });
     });
     // TODO: Add tests for "exists".
-    it('[PUT /course/:id/quiz] should issue 200 OKAY for existing course', function (done) {
+    it('[PUT /course/:id/quiz] should issue [200 OKAY] for existing course', function (done) {
       var some_date = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
       var url = '/api/course/1/quiz?id=2&index=0&queue=0&date=' + encodeURIComponent(some_date);
       request(app)
@@ -398,7 +401,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[PUT /course/:id/quiz] should issue 404 NOT FOUND for non-existant course', function (done) {
+    it('[PUT /course/:id/quiz] should issue [404 NOT FOUND] for non-existant course', function (done) {
       var some_date = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
       var url = '/api/course/919191/quiz?id=2&index=0&queue=0&date=' + encodeURIComponent(some_date);
       request(app)
@@ -427,7 +430,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it("[POST /quiz] should issue 400 BAD REQ on incomplete form data", function (done) {
+    it("[POST /quiz] should issue [400 BAD REQ] on incomplete form data", function (done) {
       var quiz2 = {
         // No title
         author: "Pynch"
@@ -441,7 +444,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it("[GET /quiz/:id] should issue 200 OKAY with json for existing user", function (done) {
+    it("[GET /quiz/:id] should issue [200 OKAY] with json for existing quiz", function (done) {
       request(app)
         .get('/api/quiz/1')
         .expect(200)
@@ -451,7 +454,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it("[GET /quiz/:id] should issue 404 NOT FOUND with json for non-existant user", function (done) {
+    it("[GET /quiz/:id] should issue [404 NOT FOUND] with json for non-existant quiz", function (done) {
       request(app)
         .get('/api/quiz/717171')
         .expect(404)
@@ -461,7 +464,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it("[DELETE /quiz/:id] should issue 200 OKAY ", function (done) {
+    it("[DELETE /quiz/:id] should issue [200 OKAY] for existing quiz", function (done) {
       request(app)
         .delete('/api/quiz/2')
         .expect(200)
@@ -470,7 +473,7 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it("[DELETE /quiz/:id] should issue 404 NOT FOUND ", function (done) {
+    it("[DELETE /quiz/:id] should issue [404 NOT FOUND] for non-existant quiz", function (done) {
       request(app)
         .delete('/api/quiz/717171')
         .expect(404)
@@ -479,15 +482,90 @@ describe('API Controller:', function () {
           done();
         });
     });
+    // TODO: should have different response for empty analytics.
+    it("[GET /quiz/:id/analytics] should issue [200 OKAY] for existing quiz", function (done) {
+      request(app)
+        .get('/api/quiz/1/analytics')
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
+          expect(res.body).to.be.json;
+          expect(res.body).to.have.lengthOf(3);
+          done();
+        });
+    });
+    it("[GET /quiz/:id/analytics] should issue [404 NOT FOUND] for non-existant quiz", function (done) {
+      request(app)
+        .get('/api/quiz/5/analytics')
+        .expect(404)
+        .end(function (err, res) {
+          if (err) return done(err);
+          expect(res.body).to.be.json;
+          done();
+        });
+    });
+    // TODO: Should test getRecords independantly.
+    it("[GET /quiz/:id/questions] should issue [200 OKAY] for existing quiz", function (done) {
+      request(app)
+        .get('/api/quiz/1/questions')
+        .expect(200)
+        .end(function (err, res) {
+          if (err) return done(err);
+          expect(res.body).to.be.json;
+          expect(res.body).to.have.lengthOf(2);
+          done();
+        });
+    });
+    it("[GET /quiz/:id/questions] should issue [404 NOT FOUND] for non-existant quiz", function (done) {
+      request(app)
+        .get('/api/quiz/717171/questions')
+        .expect(404)
+        .end(function (err, res) {
+          if (err) return done(err);
+          expect(res.body).to.be.json;
+          done();
+        });
+    });
+    // TODO: Should test without query params.
+    it("[PUT /quiz/:id/question] should issue [200 OKAY] for existing quiz", function (done) {
+      request(app)
+        .put('/api/quiz/1/question?id=3&index=0')
+        .expect(200)
+        .end(function (err) {
+          if (err) return done(err);
+          done();
+        });
+    });
+    it("[PUT /quiz/:id/question] should issue [404 NOT FOUND] for non-existant quiz", function (done) {
+      request(app)
+        .put('/api/quiz/717171/question?id=3&index=0')
+        .expect(404)
+        .end(function (err) {
+          if (err) return done(err);
+          done();
+        });
+    });
 
-    it("[GET /quiz/:id/analytics] should issue 200 OKAY ");
-    it("[GET /quiz/:id/analytics] should issue 404 NOT FOUND ");
-    it("[GET /quiz/:id/questions] should issue 200 OKAY ");
-    it("[GET /quiz/:id/questions] should issue 404 NOT FOUND ");
-    it("[PUT /quiz/:id/question] should issue 200 OKAY ");
-    it("[PUT /quiz/:id/question] should issue 404 NOT FOUND ");
-    it("[POST /quiz/:id/record] should issue 200 OKAY ");
-    it("[POST /quiz/:id/record] should issue 404 NOT FOUND ");
+    // it("[POST /quiz/:id/record] should issue [200 OKAY] for existing quiz", function (done) {
+    //   request(app)
+    //     .post('/api/quiz/1/record')
+    //     .send({})
+    //     .expect(200)
+    //     .end(function (err) {
+    //       if (err) return done(err);
+    //       done();
+    //     });
+    // });
+    // it("[POST /quiz/:id/record] should issue [404 NOT FOUND] for non-existant quiz", function (done) {
+    //   request(app)
+    //     .post('/api/quiz/717171/record')
+    //     .send({})
+    //     .expect(404)
+    //     .end(function (err) {
+    //       if (err) return done(err);
+    //       done();
+    //     });
+    // });
   });
 
   // describe('Quiz', function () {
@@ -592,6 +670,18 @@ describe("View Controller:", function () {
 
   before(function (done) {
     async.series([
+      function (callback) {
+        knex.migrate.rollback()
+        .then(function () {
+          knex.migrate.latest()
+          .then(function () {
+            return knex.seed.run()
+            .then(function () {
+              callback();
+            });
+          });
+        });
+      },
       function (callback) {
         student
           .post('/api/auth/login')

@@ -31,9 +31,32 @@ function deleteQuiz(quiz_id) {
   }).del();
 }
 
+function getQuestions(quiz_id) {
+  return knex('quiz_question').where({
+    quiz_id: quiz_id
+  });
+}
+
+function getRecords(question_ids) {
+  return knex('question_response').whereIn('question_id', question_ids);
+}
+
+function addQuestion(quiz_id, question_id, index) {
+  return knex('quiz_question').insert({
+    quiz_id: quiz_id,
+    question_id: question_id,
+    index: index
+  });
+}
+
+
+
 module.exports = {
   exists: exists,
   getQuiz: getQuiz,
   newQuiz: create,
-  deleteQuiz: deleteQuiz
+  deleteQuiz: deleteQuiz,
+  getQuestions: getQuestions,
+  getRecords: getRecords,
+  addQuestion: addQuestion
 };

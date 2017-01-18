@@ -26,6 +26,9 @@ router.post('/auth/logout', function (req, res, next) {
 
 // =================================================
 
+/**
+ * POST /user
+ */
 router.post('/user/', jsonParser, function (req, res, next) {
   User.newUser(req.body)
     .then(function (data) {
@@ -307,6 +310,46 @@ router.delete('/quiz/:id', function (req, res, next) {
     .catch(function (err) {
       res.status(501).end();
     });
+});
+
+router.get('/quiz/:id/analytics', function (req, res, next) {
+  // Quiz exists?
+  Quiz.getQuestions(req.params.id)
+  .then(function (data) {
+    if (data.length > 0) {
+      var ids = data.map(function (row) { return row.question_id; });
+      Quiz.getRecords(ids)
+      .then(function (records) {
+        res.status(200).json(records);
+      }).catch(function (err) { res.status(501).json([]); })
+    } else { res.status(404).json([]); }
+  }).catch(function (err) { res.status(501).json([]); });
+});
+
+router.get('/quiz/:id/questions', function (req, res, next) {
+  Quiz.getQuestions(req.params.id)
+  .then(function (data) {
+    if (data.length > 0) { res.status(200).json(data); }
+    else { res.status(404).json([]); }
+  })
+  .catch(function (err) { res.status(501).json([]); });
+})
+
+router.put('/quiz/:id/question', function (req, res, next) {
+  Quiz.exists(req.params.id)
+  .then(function (data) {
+    if (data == 1) {
+      Quiz.addQuestion(req.params.id, req.query.id, req.query.index)
+      .then(function (data) {
+        res.status(200).end();
+      })
+      .catch(function (err) { console.log(err); res.status(501).end(); });
+    } else { res.status(404).end(); }
+  }).catch(function (err) { res.status(501).end(); });
+});
+
+router.post('/quiz/:id/record', jsonParser, function (req, res, next) {
+  res.status(501).end();
 });
 
 // =================================================
