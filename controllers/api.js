@@ -12,16 +12,61 @@ var User = require('../db/models/user');
 var Course = require('../db/models/course');
 var Quiz = require('../db/models/quiz');
 var Question = require('../db/models/question');
+var Qm = require('../db/models/qm');
 
 
-router.post('/auth/login', jsonParser, passport.authenticate('local', {successRedirect: '/account', failureRedirect: '/login'}), function (req, res, next) {
-  res.status(300).end();
+router.post('/auth/login', jsonParser, passport.authenticate('local', {failureRedirect: '/login'}), function (req, res, next) {
+  if (typeof req.user != "undefined") {
+    res.set('Location', '/account');
+    res.status(302).json({"status": 1});
+  } else {
+    res.status(300).end();
+  }
 });
 
 router.post('/auth/logout', function (req, res, next) {
   req.logout();
   res.set('Location', '/');
   res.status(301).end();
+});
+
+// =================================================
+
+router.post('/demo/promo', jsonParser, function (req, res, next) {
+  res.set("Content-Type", "application/json");
+
+  // Check valid ID.
+  var valid_ids = [5, 6];
+  if (valid_ids.indexOf(Number(req.body.course)) == -1) {
+    res.status(400).json({});
+  } else {
+    var quiz_id = req.body.course;
+
+    // Check if user exists
+    User.existsByPhone(req.body.phone)
+    .then(function (exists) {
+      // If they do...
+      if (exists == 1) {
+        res.status(400).json({resp: 0}); // -> Bad request (already did it)
+
+      // If they don't...
+      } else {
+        var user_params = {
+          firstname: "Promo_User",
+          phone: req.body.phone,
+          type: 0
+        };
+
+        // Add the new user
+        User.newUser(user_params)
+        .then(function (data) {
+          // Send them the quiz.
+          var sent = Qm.sendQuiz(req.body.phone, quiz_id);
+          if (sent) { res.status(200).json({resp: 1}); }
+        }).catch(function (err) { res.status(500).json({}); });
+      }
+    });
+  };
 });
 
 // =================================================

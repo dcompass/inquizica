@@ -149,7 +149,8 @@
                     <div style="color: #a0a0a0;" class="text">Try it now</div>
                     <i class="dropdown icon"></i>
                     <div class="trial menu">
-                      <div class="item" value="90210">A.N.S.</div>
+                      <div class="item" value="5">Physiology</div>
+                      <div class="item" value="5">Programming</div>
                     </div>
                   </div>
                   <input class="trial_number" placeholder="Phone Number" type="text" />
@@ -379,12 +380,33 @@
             course: courseCode,
             phone: regEx.exec(phoneNumber)[0]
           };
-          $.post("/promo", pack, function (res) {
-            window.location.href = '/?redirectheader=Success!&redirectmsg=Thanks%20for%20trying%20out%20Inquizica!';
-            console.log(res);
+
+          $.ajax({
+            type: "POST",
+            url: "/api/demo/promo",
+            data: JSON.stringify(pack),
+            contentType: "application/json",
+            success: function (res, status) {
+              if (res.resp == 0) {
+                console.log("Quiz Already Done For That Phone Number");
+                window.location.href = '/?redirectheader=Oops!&redirectmsg=Seems%20like%20you%20already%20tried%20Inquizica!';
+              } else if (res.resp == 1) {
+                console.log("New User Signed Up and Sent");
+                window.location.href = '/?redirectheader=Success!&redirectmsg=Thanks%20for%20trying%20out%20Inquizica!';
+              } else {
+                console.log("Error");
+                // window.location.href = '/?redirectheader=Success!&redirectmsg=Thanks%20for%20trying%20out%20Inquizica!';
+              }
+
+            },
+            error: function (bleh, status) {
+              console.log("E", status);
+            }
+            // dataType: "json"
           });
         }
       });
+
 
       // If on mobile....
       if (window.matchMedia( "(max-width: 767px)" ).matches) {

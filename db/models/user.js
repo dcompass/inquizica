@@ -60,6 +60,13 @@ function exists(user_id) {
     });
 }
 
+function existsByPhone(user_phone) {
+  return knex.raw("select exists(select 1 from USER where phone = ?) as exists_check", user_phone)
+    .then(function (resp) {
+      return resp[0][0].exists_check;
+    });
+}
+
 module.exports = {
   getUser: read,
   newUser: create,
@@ -68,5 +75,6 @@ module.exports = {
   getProg: getProgression,
   updateProg: updateProgression,
   getCourses: getCourses,
-  exists: exists
+  exists: exists,
+  existsByPhone: existsByPhone
 }

@@ -10,6 +10,11 @@ process.stdout.write('\u001B[2J\u001B[0;0f');
 var logger = require(__dirname + '/middleware/logs.js');
 logger.log('info', "Starting Logger...");
 
+if (process.env.NODE_ENV != "test") {
+  var morgan = require('morgan');
+  app.use(morgan('dev'));
+}
+
 // Views & Public
 var hbs = require('hbs');
 app.set('view engine', 'hbs');
@@ -47,9 +52,11 @@ passport.use(new LocalStrategy({
   usernameField: 'email',
   passwordField: 'passwd'
 }, function (username, password, done) {
+  // logger.log('info', username, password);
   knex_db('user').where({
     email: username
   }).then(function (data) {
+    // logger.log('info', data);
     if (data.length == 0) {
       logger.log('error', 'No such user.');
     } else {
@@ -103,13 +110,15 @@ app.use('/', require('./controllers/views'));
 
 app.use(function(err, req, res, next) {
   console.error("~Error Handler~\n", err.stack);
-  res.status(500).send('500 - Error. Whoops, looks like something broke. Please excuse us for this, we are still in our beta phase :)');
+  res.status(500).render("404");
+  // res.status(500).send('500 - Error. Whoops, looks like something broke. Please excuse us for this, we are still in our beta phase :)');
   // next();
 });
 
 app.use(function (req, res, next) {
-  res.status(404).send("404 - Page Not Found. Sorry, this is probably our fault. Thanks for your patience while we are still in our beta phase :)");
-  next();
+  res.status(404).render("404");
+  // res.status(404).send("404 - Page Not Found. Sorry, this is probably our fault. Thanks for your patience while we are still in our beta phase :)");
+  // next();
 });
 
 

@@ -4,7 +4,7 @@
   "description": "DPT Platform",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "nodemon app.js",
     "test": "mocha tests"
   },
   "author": "Sean",
@@ -27,6 +27,8 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "morgan": "^1.7.0",
+    "nodemon": "^1.11.0",
     "supertest": "^2.0.1"
   }
 }

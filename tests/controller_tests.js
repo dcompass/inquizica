@@ -568,6 +568,40 @@ describe('API Controller:', function () {
     // });
   });
 
+  describe("Demo", function () {
+    it('[POST /demo/promo] should issue [200 OKAY] if it contains a valid quiz id and phone number', function (done) {
+      request(app)
+        .post('/api/demo/promo')
+        .send({ course: '5', phone: '9998887766'})
+        .expect(200)
+        .end(function (err) {
+          if (err) return done(err);
+          done();
+        });
+    });
+    it('[POST /demo/promo] should issue [400 BAD REQ] if it contains an invalid quiz id', function (done) {
+      request(app)
+        .post('/api/demo/promo')
+        .send({ course: '2', phone: '6106754305'})
+        .expect(400)
+        .end(function (err) {
+          if (err) return done(err);
+          done();
+        });
+    });
+    it('[POST /demo/promo] should issue [400 BAD REQ] if it contains an existing users phone number', function (done) {
+      request(app)
+        .post('/api/demo/promo')
+        .send({ course: '5', phone: '6106754305'})
+        .expect(400)
+        .end(function (err) {
+          if (err) return done(err);
+          done();
+        });
+    });
+    // it should get/send json 
+  });
+
   // describe('Quiz', function () {
 
   //   it("should UPDATE a given quiz", function (done) {

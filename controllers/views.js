@@ -52,10 +52,11 @@ router.get('/admin', allowAbove3, function (req, res) {
 // Utilities
 
 function allowOnly0 (req, res, next) {
+  console.log(req.user);
   if (typeof req.user == "undefined") {
     next();
   } else if (req.user.type > 0) {
-    res.status(301).set('Location', '/account').end();
+    res.status(303).set('Location', '/account').end();
   } else {
     next();
   }
