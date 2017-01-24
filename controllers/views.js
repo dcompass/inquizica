@@ -4,7 +4,11 @@ var router = express.Router();
 // Public
 
 router.get('/', function (req, res) {
-  res.render('index');
+  if (typeof req.user == "undefined") {
+    res.render('index', {user: null} );
+  } else {
+    res.render('index', {user: req.user});
+  }
 });
 
 router.get('/demos', function (req, res) {
@@ -23,7 +27,7 @@ router.get('/login', allowOnly0, function (req, res) {
 // Students
 
 router.get('/account', allowAbove1, function (req, res) {
-  res.render('account');
+  res.render('account', {user: req.user});
 });
 
 router.get('/course/:id', allowAbove1, function (req, res) {
