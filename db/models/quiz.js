@@ -32,11 +32,16 @@ function deleteQuiz(quiz_id) {
 }
 
 function getQuestions(quiz_id) {
-  return knex('quiz_question').where({
-    quiz_id: quiz_id
-  });
+  return knex('quiz_question')
+    .join('question', 'quiz_question.question_id', '=', 'question.id')
+    .join('question_response', 'quiz_question.question_id', '=', 'question_response.question_id')
+    .select('quiz_question.quiz_id', 'question.question', 'question.id as question_id', 'question_response.response', 'question_response.id')
+    .where({
+      quiz_id: quiz_id
+    });
 }
 
+// TODO: Currently gets responses, not records!!
 function getRecords(question_ids) {
   return knex('question_response').whereIn('question_id', question_ids);
 }

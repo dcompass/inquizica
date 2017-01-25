@@ -17,8 +17,7 @@ var Qm = require('../db/models/qm');
 
 router.post('/auth/login', jsonParser, passport.authenticate('local', {failureRedirect: '/login'}), function (req, res, next) {
   if (typeof req.user != "undefined") {
-    res.set('Location', '/account');
-    res.status(302).json({"status": 1});
+    res.status(200).json({"redirect_url": "/account"});
   } else {
     res.status(300).end();
   }
@@ -27,7 +26,13 @@ router.post('/auth/login', jsonParser, passport.authenticate('local', {failureRe
 router.post('/auth/logout', function (req, res, next) {
   req.logout();
   res.set('Location', '/');
-  res.status(301).end();
+  res.status(303).end();
+});
+
+router.get('/auth/logout', function (req, res, next) {
+  req.logout();
+  res.set('Location', '/');
+  res.status(303).end();
 });
 
 // =================================================
@@ -169,8 +174,8 @@ router.get('/user/:id/courses', function (req, res, next) {
       if (data.length == 0) {
         res.status(404).json([]);
       } else {
-        var results = data.map(function (elem) { return elem.course_id; });
-        res.status(200).json(results);
+        // var results = data.map(function (elem) { return elem.course_id; });
+        res.status(200).json(data);
       }
     })
     .catch(function (err) {
@@ -374,10 +379,27 @@ router.get('/quiz/:id/analytics', function (req, res, next) {
 router.get('/quiz/:id/questions', function (req, res, next) {
   Quiz.getQuestions(req.params.id)
   .then(function (data) {
-    if (data.length > 0) { res.status(200).json(data); }
+    if (data.length > 0) {
+
+      // Count ids for grouping.
+      var tmp = [];
+      data.forEach(function (resp, idx) {
+        if (tmp.indexOf(resp.question_id) == -1) { tmp.push(resp.question_id); }
+      });
+
+      // Fill questions array.
+      var questions = new Array(tmp.length);
+      data.forEach(function (resp, idx) {
+        var spot = tmp.indexOf(resp.question_id);
+        if (typeof questions[spot] == "undefined") { questions[spot] = []; }
+        questions[spot].push(resp);
+      });
+
+      res.status(200).json(questions);
+    }
     else { res.status(404).json([]); }
   })
-  .catch(function (err) { res.status(501).json([]); });
+  .catch(function (err) { console.log(err); res.status(501).json([]); });
 })
 
 router.put('/quiz/:id/question', function (req, res, next) {

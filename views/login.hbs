@@ -89,9 +89,14 @@
           url: "/api/auth/login",
           data: JSON.stringify(formData),
           success: function (resp) {
-            console.log(resp);
+            // console.log("A", resp);
+            window.location.href = resp.redirect_url;
           },
-          dataType: "json",
+          error: function (xhr, status) {
+            alert("Error Logging In");
+            // console.log("B", xhr, status);
+          },
+          // dataType: "text",
           contentType: "application/json"
         });
       });

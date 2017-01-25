@@ -13,11 +13,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-    <!-- <script src="https://npmcdn.com/react@15.3.1/dist/react.js"></script>
+    <script src="https://npmcdn.com/react@15.3.1/dist/react.js"></script>
     <script src="https://npmcdn.com/react-dom@15.3.1/dist/react-dom.js"></script>
-    <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script> -->
+    <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
     <script src="https://npmcdn.com/jquery@3.1.0/dist/jquery.min.js"></script>
-    <script src="https://npmcdn.com/remarkable@1.6.2/dist/remarkable.min.js"></script>
+    <!-- <script src="https://npmcdn.com/remarkable@1.6.2/dist/remarkable.min.js"></script> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.4/semantic.min.css" />
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.4/semantic.min.js"></script>
 
@@ -157,10 +157,10 @@
               <i class="sidebar icon"></i>
             </a>
             <a id="logo" class="header item" href="/">Inquizica</a>
-            <div style="line-height: 1.4em;" class="item">Account Dashboard (beta)</div>
+            <div style="line-height: 1.4em;" class="item">Account Dashboard</div>
             <!-- <a class="item">Careers</a> -->
             <div class="right item">
-              <a href="/logout" class="ui inverted button">Log out</a>
+              <a href="/api/auth/logout" class="ui inverted button">Log out</a>
             </div>
           </div>
         </div>
@@ -169,27 +169,14 @@
       <div style="margin: 1em 0;" class="ui hidden section divider"></div>
 
       <!-- User View -->
+
+
       <div class="ui two column centered stackable grid container">
         <div class="column">
+          <div id="main"></div>
+
+
           <div class="ui white segment">
-            <h1 class="ui header">{{user.firstname}} {{user.lastname}}
-              <div class="sub header">
-                {{user.typeName}} | {{user.affiliation}} | {{user.phone}}
-              </div>
-            </h1>
-
-            <h1 class="ui header">
-              ${ firstname } ${ user.firstname }
-              <div class="sub header">
-                ${user.typeName} | ${user.affiliation} | ${phone}
-              </div>
-            </h1>
-
-            <div id="example">
-              ${ message }
-            </div>
-            <h1 v-if="ok">Admin</h1>
-
             <div class="ui cards">
             <!-- {{#each courses}}
               <div class="card">
@@ -293,107 +280,71 @@
 
     </div>
 
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone-min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
-    <script>
-      var app = {};
-
-      app.User = Backbone.Model.extend({
-        defaults: {
-          name: 'Default',
-          admin: false
-        }
-      });
-
-      app.UserView = Backbone.View.extend({
-        el: '#example-2',
-        initialize: function () {
-          this.render();
+    <script type="text/babel">
+      var DashContainer = React.createClass({
+        getInitialState: function () {
+          return {
+            user: {},
+            courses: []
+          }
+        },
+        componentDidMount: function () {
+          var user_url = '/api/user/' + {{ user.id }};
+          var prom1 = axios.get(user_url);
+          var course_url = '/api/user/' + {{ user.id }} + '/courses';
+          var prom2 = axios.get(course_url);
+          var self = this;
+          Promise.all([prom1, prom2]).then(function (resp) {
+            console.log(resp[1]);
+            self.setState({
+              user: resp[0].data,
+              courses: resp[1].data
+            });
+          })
+          .catch(function (err) {
+            console.log(err);
+          });
         },
         render: function () {
-          this.$el.html("Hello World!");
+          var classes = [];
+          this.state.courses.forEach(function (course, index) {
+            classes.push(<Course id={course.id} title={course.title} key={index}></Course>);
+          });
+
+          return (
+            <div className="ui white segment">
+              <h1 className="ui header">{this.state.user.firstname} {this.state.user.lastname}
+                <div className="sub header">
+                  {this.state.user.type} | {this.state.user.affiliation} | {this.state.user.phone}
+                </div>
+              </h1>
+              {classes}
+            </div>
+
+
+          )
         }
       });
-    </script> -->
 
-    <script src="https://unpkg.com/vue/dist/vue.js"></script>
-    <script>
-      var app = new Vue({
-        delimiters: ['${', '}'],
-        el: '#example',
-        data: {
-          message: "Hello World",
-          user: {},
-          firstname: '',
-          lastname: '',
-          phone: '',
-          ok: false
-        },
-        created: function () {
-          this.fetchUser();
-        },
-        methods: {
-          fetchUser: function () {
-            var self = this;
-            $.ajax({
-              method: "GET",
-              url: "/api/user/" + {{ user.id }},
-              success: function (resp) {
-                self.$set(self.user, resp.firstname);
-                // self.firstname = resp.firstname;
-                self.phone = resp.phone;
-                // self.user = Object.assign({}, self.user, resp);
-                // self.$set(self.user, resp);
-                // self.$set(self.user)
-                // self.user = resp.id;
-                // self.user = resp;
-                self.ok = true;
-                // console.log(resp);
-              }
-            });
-
-          }
+      var Course = React.createClass({
+        render: function () {
+          var url = '/course/' + this.props.id;
+          return (
+            <div>
+              <a className="" href={url}>{this.props.title}</a>
+            </div>
+          )
         }
-      });
+      })
+
+      ReactDOM.render(
+        <DashContainer></DashContainer>,
+        document.getElementById('main')
+      );
     </script>
 
-
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mithril/0.2.5/mithril.js"></script>
-    <script>
-      var App = {};
-
-      App.userInfo = function () {
-        var user_url = "/api/user/" + {{user.id}};
-        console.log(user_url);
-        return m.request({method: "GET", url: user_url });
-      };
-
-      App.courseInfo = function () {
-        var course_url = "/api/user/" + {{user.id}} + "/courses";
-        console.log(course_url);
-        return m.request({method: "GET", url: course_url });
-      };
-
-      App.controller = function () {
-        var user = App.userInfo();
-        var course = App.courseInfo();
-        return {
-          user: user,
-          course: course
-        }
-      };
-
-      App.view = function (ctrl) {
-        return [
-          m('h1', "User Dashboard"),
-          m('div', ctrl.user()),
-          m('div', ctrl.course())
-        ]
-      };
-
-      m.mount(document.getElementById('example'), App);
-    </script> -->
 
     <script>
       $(function () {

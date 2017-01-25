@@ -177,6 +177,79 @@
     </div>
 
     <!-- Main React Script  -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script type="text/babel">
+      var QuizContainer = React.createClass({
+        getInitialState: function () {
+          return {
+            phase: 0,
+            lastPhase: 6,
+            quiz: {},
+            questions: [],
+            responses: [], // ??
+            analytics: [],
+            answers: {}
+          }
+        },
+        componentDidMount: function () {
+          var quizPromise = axios.get('/api/quiz/{{data}}');
+          var questionsPromise = axios.get('/api/quiz/{{data}}/questions');
+          var analyticsPromise = axios.get('/api/quiz/{{data}}/analytics');
+
+          Promise.all([quizPromise, questionsPromise, analyticsPromise])
+          .then(function (resp) {
+            console.log(resp);
+
+            var quizData2 = {
+              quiz: resp[0].data,
+              questions: resp[1].data
+            }
+
+            this.setState({
+              quizData: quizData2,
+              lastPhase: 10,
+              analytics: {
+                questions: resp[2].data,
+                quiz: {}
+              }
+            })
+
+            // Shuffle Questions.
+
+            $('#progress_bar').progress({
+              showActivity: false,
+              total: this.state.lastPhase
+            });
+          }.bind(this))
+          .catch(function (err) {
+            console.log(err);
+          });
+
+        },
+        render: function () {
+          var phaseType = categorizePhase(this.state.phase, this.state.lastPhase);
+          var questionNumber = Math.ceil(this.state.phase / 2) - 1;
+          return (
+            <div className="ui large">
+              <div className="ui tall stacked segment">
+                <ProgressBar phase={this.state.phase} />
+                {phaseType == 0 ? (<Init quizInfo={this.state.quizData.quiz}></Init>) : null }
+                {phaseType == 1 ? (<Continue></Continue>) : null }
+                {phaseType == 2 ? (<Results analytics={this.state.analytics} answers={this.state.answerData}></Results>) : null }
+                {phaseType == 3 ? (<Question question={this.state.quizData.questions[questionNumber]}></Question>) : null }
+                {phaseType == 4 ? (<Answer question={this.state.quizData.questions[questionNumber]} ans={this.state.answerData[questionNumber]} analytics={this.state.analytics.questions}></Answer>) : null }
+                {phaseType == 5 ? (<Error></Error>) : null }
+                <Controls phase={this.state.phase} lastPhase={this.state.lastPhase} update={this.updatePhase} />
+              </div>
+            </div>
+          )
+        }
+      });
+
+
+    </script>
+
 
     <script type="text/babel">
 
@@ -235,26 +308,61 @@
           // console.log(this.state.phase);
         },
         componentDidMount: function () {
-          this.serverRequest = $.get(this.props.source, function (result) {
-            console.log("Server:", this.props.source, result);
+          // var self = this;
+          var quizPromise = axios.get('/api/quiz/{{data}}');
+          var questionsPromise = axios.get('/api/quiz/{{data}}/questions');
+          var analyticsPromise = axios.get('/api/quiz/{{data}}/analytics');
+
+          Promise.all([quizPromise, questionsPromise, analyticsPromise])
+          .then(function (resp) {
+            console.log(resp);
+
+            var quizData2 = {
+              quiz: resp[0].data,
+              questions: resp[1].data
+            }
+
             this.setState({
-              quizData: result,
-              lastPhase: 2 + (result.questions.length * 2),
+              quizData: quizData2,
+              lastPhase: 10,
               analytics: {
-                questions: result.analytics,
+                questions: resp[2].data,
                 quiz: {}
               }
-            });
-            this.state.quizData.questions.forEach(function (question, index) {
-              // console.log(question[0].id, question[1].id);
-              shuffleArray(question);
-              // console.log(question[0].id, question[1].id);
-            });
+            })
+
+            // Shuffle Questions.
+
             $('#progress_bar').progress({
               showActivity: false,
               total: this.state.lastPhase
             });
-          }.bind(this));
+          }.bind(this))
+          .catch(function (err) {
+            console.log(err);
+          });
+
+
+          // this.serverRequest = $.get(this.props.source, function (result) {
+          //   console.log("Server:", this.props.source, result);
+          //   this.setState({
+          //     quizData: result,
+          //     lastPhase: 2 + (result.questions.length * 2),
+          //     analytics: {
+          //       questions: result.analytics,
+          //       quiz: {}
+          //     }
+          //   });
+          //   this.state.quizData.questions.forEach(function (question, index) {
+          //     // console.log(question[0].id, question[1].id);
+          //     shuffleArray(question);
+          //     // console.log(question[0].id, question[1].id);
+          //   });
+          //   $('#progress_bar').progress({
+          //     showActivity: false,
+          //     total: this.state.lastPhase
+          //   });
+          // }.bind(this));
         },
         componentWillUnmount: function () {
           this.serverRequest.abort();
@@ -387,6 +495,7 @@
         render: function () {
           var title = "title";
           if (typeof this.props.question !== "undefined") {
+            console.log(this.props.question);
             title = this.props.question[0].question;
           }
 
@@ -528,7 +637,7 @@
       });
 
       ReactDOM.render(
-        <QuizContainer source="/api/quiz/{{data.id}}"/>, // This is also JSX.
+        <QuizContainer source="/api/quiz/{{data}}"/>, // This is also JSX.
         document.getElementById('container')
       );
     </script>

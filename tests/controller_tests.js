@@ -124,7 +124,7 @@ describe('API Controller:', function () {
         .end(function (err, res) {
           if (err) return done(err);
           expect(res.body).to.be.an.array;
-          expect(res.body).to.have.lengthOf(4);
+          expect(res.body).to.have.lengthOf(3);
           done();
         });
     });
@@ -198,14 +198,14 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[POST /login] should issue 302 redirect to /account when successful', function (done) {
+    it('[POST /login] should issue [200 OKAY] with json when successful', function (done) {
       student
         .post('/api/auth/login')
-        .send({email: 'seanjcrl@gmail.com', passwd: 'password123' })
-        .expect(302)
+        .send({email: 'adam@gmail.com', passwd: 'password123' })
+        .expect(200)
         .end(function (err, res) {
           if (err) return done(err);
-          expect(res.headers['location']).to.equal('/account');
+          expect(res.body).to.be.json;
           done();
         });
     });
@@ -218,10 +218,10 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it('[POST /logout] should issue 301 redirect to / when successfully logged out', function (done) {
+    it('[POST /logout] should issue [303 REDIRECT] to / when successfully logged out', function (done) {
       student
         .post('/api/auth/logout')
-        .expect(301)
+        .expect(303)
         .end(function (err, res) {
           if (err) return done(err);
           done();
@@ -240,7 +240,7 @@ describe('API Controller:', function () {
 
   describe("Course", function () {
     // TODO: should return new course id on success too (and redirect there...).
-    it('[POST /course] should issue 301 redirect on success', function (done) {
+    it('[POST /course] should issue [301 REDIRECT] on success', function (done) {
       var course_data = {
         title: "Physiology",
         description: "Medical school level course",
@@ -373,7 +373,7 @@ describe('API Controller:', function () {
     // });
     it('[PUT /course/:id/user] should issue [200 OKAY] for existing course', function (done) {
       request(app)
-        .put('/api/course/1/user?id=2')
+        .put('/api/course/1/user?id=4')
         .expect(200)
         .end(function (err, res) {
           if (err) return done(err);
@@ -392,7 +392,7 @@ describe('API Controller:', function () {
     // TODO: Add tests for "exists".
     it('[PUT /course/:id/quiz] should issue [200 OKAY] for existing course', function (done) {
       var some_date = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
-      var url = '/api/course/1/quiz?id=2&index=0&queue=0&date=' + encodeURIComponent(some_date);
+      var url = '/api/course/1/quiz?id=4&index=3&queue=0&date=' + encodeURIComponent(some_date);
       request(app)
         .put(url)
         .expect(200)
@@ -490,13 +490,13 @@ describe('API Controller:', function () {
         .end(function (err, res) {
           if (err) return done(err);
           expect(res.body).to.be.json;
-          expect(res.body).to.have.lengthOf(3);
+          expect(res.body).to.have.lengthOf(4);
           done();
         });
     });
     it("[GET /quiz/:id/analytics] should issue [404 NOT FOUND] for non-existant quiz", function (done) {
       request(app)
-        .get('/api/quiz/5/analytics')
+        .get('/api/quiz/9/analytics')
         .expect(404)
         .end(function (err, res) {
           if (err) return done(err);
@@ -592,14 +592,14 @@ describe('API Controller:', function () {
     it('[POST /demo/promo] should issue [400 BAD REQ] if it contains an existing users phone number', function (done) {
       request(app)
         .post('/api/demo/promo')
-        .send({ course: '5', phone: '6106754305'})
+        .send({ course: '5', phone: '1234567890'})
         .expect(400)
         .end(function (err) {
           if (err) return done(err);
           done();
         });
     });
-    // it should get/send json 
+    // it should get/send json
   });
 
   // describe('Quiz', function () {
@@ -719,11 +719,11 @@ describe("View Controller:", function () {
       function (callback) {
         student
           .post('/api/auth/login')
-          .send({email: 'seanjcrl@gmail.com', passwd: 'password123' })
-          .expect(302)
+          .send({email: 'adam@gmail.com', passwd: 'password123' })
+          .expect(200)
           .end(function (err, res) {
             if (err) return callback(err);
-            expect(res.headers['location']).to.equal('/account');
+            // expect(res.headers['location']).to.equal('/account');
             console.log("   student logged in");
             callback();
           });
@@ -731,11 +731,11 @@ describe("View Controller:", function () {
       function (callback) {
         teacher
           .post('/api/auth/login')
-          .send({email: 'sean@gmail.com', passwd: 'wordpass123' })
-          .expect(302)
+          .send({email: 'diana@gmail.com', passwd: 'wordpass123' })
+          .expect(200)
           .end(function (err, res) {
             if (err) return callback(err);
-            expect(res.headers['location']).to.equal('/account');
+            // expect(res.headers['location']).to.equal('/account');
             console.log("   teacher logged in");
             callback();
           });
@@ -743,11 +743,11 @@ describe("View Controller:", function () {
       function (callback) {
         admin
           .post('/api/auth/login')
-          .send({email: 'sheen@gmail.com', passwd: 'admin' })
-          .expect(302)
+          .send({email: 'elizabeth@gmail.com', passwd: 'admin' })
+          .expect(200)
           .end(function (err, res) {
             if (err) return callback(err);
-            expect(res.headers['location']).to.equal('/account');
+            // expect(res.headers['location']).to.equal('/account');
             console.log("   admin logged in");
             callback();
           });
@@ -763,7 +763,7 @@ describe("View Controller:", function () {
       function (callback) {
         student
           .post('/api/auth/logout')
-          .expect(301)
+          .expect(303)
           .end(function (err, res) {
             if (err) return callback(err);
             console.log("   student logged out");
@@ -773,7 +773,7 @@ describe("View Controller:", function () {
       function (callback) {
         teacher
           .post('/api/auth/logout')
-          .expect(301)
+          .expect(303)
           .end(function (err, res) {
             if (err) return callback(err);
             console.log("   teacher logged out");
@@ -783,7 +783,7 @@ describe("View Controller:", function () {
       function (callback) {
         admin
           .post('/api/auth/logout')
-          .expect(301)
+          .expect(303)
           .end(function (err, res) {
             if (err) return callback(err);
             console.log("   admin logged out");
@@ -896,20 +896,20 @@ describe("View Controller:", function () {
           done();
         });
     })
-    it("[GET /signup] should issue 301 redirect to /account for students", function (done) {
+    it("[GET /signup] should issue 303 redirect to /account for students", function (done) {
       student
         .get('/signup')
-        .expect(301)
+        .expect(303)
         .end(function (err, res) {
           if (err) return done(err);
           expect(res.header['location']).equals('/account');
           done();
         });
     })
-    it("[GET /signup] should issue 301 redirect to /account for teacers", function (done) {
+    it("[GET /signup] should issue 303 redirect to /account for teacers", function (done) {
       teacher
         .get('/signup')
-        .expect(301)
+        .expect(303)
         .end(function (err, res) {
           if (err) return done(err);
           expect(res.header['location']).equals('/account');
@@ -928,20 +928,20 @@ describe("View Controller:", function () {
           done();
         });
     });
-    it("[GET /login] should issue 301 redirect to /account for students", function (done) {
+    it("[GET /login] should issue 303 redirect to /account for students", function (done) {
       student
         .get('/login')
-        .expect(301)
+        .expect(303)
         .end(function (err, res) {
           if (err) return done(err);
           expect(res.headers['location']).to.equal('/account');
           done();
         });
     });
-    it("[GET /login] should issue 301 redirect to /account for teachers", function (done) {
+    it("[GET /login] should issue 303 redirect to /account for teachers", function (done) {
       teacher
         .get('/login')
-        .expect(301)
+        .expect(303)
         .end(function (err, res) {
           if (err) return done(err);
           expect(res.headers['location']).to.equal('/account');

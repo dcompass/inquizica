@@ -48,7 +48,9 @@ function updateProgression(user_id, course_id, progression) {
 }
 
 function getCourses(user_id) {
-  return knex('user_course').where({
+  return knex('user_course').select('*')
+  .join('course', 'user_course.course_id', '=', 'course.id')
+  .where({
     user_id: user_id
   });
 }

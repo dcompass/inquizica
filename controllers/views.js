@@ -35,7 +35,7 @@ router.get('/course/:id', allowAbove1, function (req, res) {
 });
 
 router.get('/quiz/:id', allowAbove1, function (req, res) {
-  res.render('quiz');
+  res.render('quiz', {'data': req.params.id});
 });
 
 
@@ -56,7 +56,7 @@ router.get('/admin', allowAbove3, function (req, res) {
 // Utilities
 
 function allowOnly0 (req, res, next) {
-  console.log(req.user);
+  // console.log(req.user);
   if (typeof req.user == "undefined") {
     next();
   } else if (req.user.type > 0) {
