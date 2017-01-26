@@ -14,12 +14,12 @@
     <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone.js"></script> -->
 
-    <!-- <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
-    <script src="https://npmcdn.com/remarkable@1.6.2/dist/remarkable.min.js"></script> -->
+    <script src="https://npmcdn.com/babel-core@5.8.38/browser.min.js"></script>
+    <!-- <script src="https://npmcdn.com/remarkable@1.6.2/dist/remarkable.min.js"></script> -->
 
 
-    <!-- <script src="https://npmcdn.com/react@15.3.1/dist/react.js"></script>
-    <script src="https://npmcdn.com/react-dom@15.3.1/dist/react-dom.js"></script> -->
+    <script src="https://npmcdn.com/react@15.3.1/dist/react.js"></script>
+    <script src="https://npmcdn.com/react-dom@15.3.1/dist/react-dom.js"></script>
 
     <link rel="stylesheet" href="../public/css/pikaday.css"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.4/semantic.min.css" />
@@ -193,6 +193,35 @@
       }
     </style>
 
+    <style>
+      /*.analytics4 svg {
+        background-color: grey;
+      }*/
+
+      .course.tab .controls {
+        height: 4em;
+        width: 8em;
+        /*background-color: #f6f6f6;*/
+        margin-right: 1em;
+        margin-top: 1em;
+        float: left;
+        text-align: center;
+      }
+
+      .course.tab .controls button {
+        margin-top: 0.5em;
+      }
+
+      .scheduleList {
+        margin-top: 2em;
+      }
+
+      .scheduleList li {
+        list-style: none;
+      }
+
+    </style>
+
   </head>
   <body>
 
@@ -220,85 +249,442 @@
       <!-- Body -->
       <div style="margin: 1em 0;" class="ui hidden section divider"></div>
 
-      <div class="column" style="width: 85% !important; margin: 0 auto;">
+      <div class="column" style="width: 55% !important; margin: 0 auto;">
 
-      <div class="ui segment">
+        <div class="ui segment">
+          <div id="page_container">
 
-        <!-- Dashboard Menu  -->
-        <div class="ui secondary pointing menu" style="border-bottom: 2px solid rgba(34,36,38,.15);">
-          <div class="active item overview">Overview</div>
-          <div class="item schedule">Schedule</div>
-          <div class="item course">Course Analytics</div>
-          <div class="item student">Student Analytics</div>
+          </div>
         </div>
 
-        <!-- Content -->
-        <div class="ui content segment">
+        <!-- <div class="ui segment">
 
-          <!-- Overview -->
-          <div class="overview tab">
-            <div class="ui items">
-              <div class="item">
-                <div class="image">
-                  <img src="http://www.placehold.it/150x150">
-                </div>
-                <div class="content">
-                  <div>
-                    <a href="#" class="header" style="font-size:1.3em; font-weight:700;">{{overview.title}}</a>
+
+          <div class="ui secondary pointing menu" style="border-bottom: 2px solid rgba(34,36,38,.15);">
+            <div class="active item overview">Overview</div>
+            <div class="item schedule">Schedule</div>
+            <div class="item course">Course Analytics</div>
+            <div class="item student">Student Analytics</div>
+          </div>
+
+
+          <div class="ui content segment">
+
+
+            <div class="overview tab">
+              <div class="ui items">
+                <div class="item">
+                  <div class="image">
+                    <img src="http://www.placehold.it/150x150">
                   </div>
-                  <div class="meta">
-                    <span>{{overview.description}}</span>
-                  </div>
-                  <div class="description">
-                    <p><strong>Instructor:</strong> {{overview.author}} at {{overview.institution}}</p>
-                    <p><strong>Timeline:</strong> {{overview.startdate}} thru {{overview.enddate}}</p>
-                  </div>
-                  <div class="extra" style="padding-left: 1em;">
-                    <a class="ui tag label">{{overview.topics}}</a>
+                  <div class="content">
+                    <div>
+                      <a href="#" class="header" style="font-size:1.3em; font-weight:700;">{{overview.title}}</a>
+                    </div>
+                    <div class="meta">
+                      <span>{{overview.description}}</span>
+                    </div>
+                    <div class="description">
+                      <p><strong>Instructor:</strong> {{overview.author}} at {{overview.institution}}</p>
+                      <p><strong>Timeline:</strong> {{overview.startdate}} thru {{overview.enddate}}</p>
+                    </div>
+                    <div class="extra" style="padding-left: 1em;">
+                      <a class="ui tag label">{{overview.topics}}</a>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Schedule -->
-          <div class="schedule tab">
-            <div class="ui list">
-              {{#each schedule}}
-                <div class="item">
-                  <div class="header">{{this.title}}</div>
-                  {{this.quizDate}}
-                </div>
-              {{/each}}
+
+            <div class="schedule tab">
+              <div class="ui list">
+                {{#each schedule}}
+                  <div class="item">
+                    <div class="header">{{this.title}}</div>
+                    {{this.quizDate}}
+                  </div>
+                {{/each}}
+              </div>
             </div>
-          </div>
 
-          <!-- Course Analytics  -->
-          <div class="course tab">
-            <div class="ui blue button">Back to top</div>
-            <div style="background: #f6f6f6;" class="analytics3"></div>
-          </div>
 
-          <!-- Student Analytics -->
-          <div class="student tab">
-            Hi3
-          </div>
+            <div class="course tab">
+              <div class="ui blue button">Back to top</div>
+              <div style="background: #f6f6f6;" class="analytics3"></div>
+            </div>
 
-        </div>
+
+            <div class="student tab">
+              Hi3
+            </div>
+
+          </div>
+        </div> -->
+
+        <!-- <div class="ui segment">
+          <div style="background: #f6f6f6;" class="analytics3"></div>
+          <br />
+          <div class="ui blue button">Back to top</div>
+        </div> -->
+
+        <div style="margin: 1em 0;" class="ui hidden section divider"></div>
+
       </div>
 
-      <!-- <div class="ui segment">
-        <div style="background: #f6f6f6;" class="analytics3"></div>
-        <br />
-        <div class="ui blue button">Back to top</div>
-      </div> -->
 
-      <div style="margin: 1em 0;" class="ui hidden section divider"></div>
 
-    </div>
+
+
+
+
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <!-- SVG Chart -->
+    <script>
+      var courseChart = {};
+
+      courseChart.create = function (el, props, state) {
+        console.log("Creating SVG at:", el, props);
+        // Create SVG Canvas
+
+        courseChart.x = d3.scale.linear()
+          .domain([0, 100])
+          .range([0, props.width]);
+
+        courseChart.xAxis = d3.svg.axis()
+          .scale(courseChart.x)
+          .orient('bottom')
+          .ticks(5);
+
+        courseChart.svg = d3.select(el).append('svg')
+          .attr('width', (props.width + props.margin.left + props.margin.right))
+          .attr('height', (props.height + props.margin.top + props.margin.bottom))
+          .attr('transform', 'translate('+ props.margin.left + ',' + props.margin.top + ')');
+
+        courseChart.svg.append('g')
+          .attr('class', 'x axis');
+
+        courseChart.svg.append('text')
+          .attr('class', 'label')
+          .attr('text-anchor', 'middle');
+
+        this.update(el, props, state);
+      };
+
+      courseChart.update = function (el, props, state) {
+        console.log("Updating with: ", state);
+        if (typeof state == "undefined") return;
+
+        courseChart.svg.attr('height', props.height + props.margin.top + props.margin.bottom);
+
+        courseChart.svg.select('.x.axis')
+          .attr('transform', 'translate(0,' + (props.barHeight * state.length) + ')')
+          .call(courseChart.xAxis);
+
+        courseChart.svg.select('.label')
+          .attr('transform', 'translate('+ (props.width / 2) +','+ (props.barHeight * state.length + 35) +')')
+          .text(function () {
+            var type = state[0].type;
+            if (type == "Qui") { return "Avg. Score"; } else
+            if (type == "Que") { return "% Correct Reponses"; }
+            else               { return "% Chosen Reponses"; }
+          });
+
+        // JOIN Data ===========================================================
+        var bar = courseChart.svg.selectAll('g.bar').data(state, function (d) { return d.title });
+
+        // EXIT ================================================================
+        bar.exit().remove();
+
+        // UPDATE ==============================================================
+        var updateBar = d3.transition(bar);
+
+        updateBar.select('rect')
+          .attr('fill', function (d) { return (d.correct ? "green" : "#006c94" ); })
+          .attr('width', function (d) { return courseChart.x(d.score); });
+
+        updateBar.select('text')
+          .attr('x', function (d) { return 2; })
+          .text(function (d) { return d.title; });
+
+        // ENTER ===============================================================
+        var enterBar = bar.enter().append('g') // Bar container
+          .attr('class', 'bar')
+          .attr('transform', function (d, i) { return "translate(0, "+ i * props.barHeight +")"; });
+
+        enterBar.append('rect') // Actual bar
+          .attr('fill', function (d) { return (d.correct ? "green" : "#006c94" ); })
+          .attr('width', function (d) { return courseChart.x(d.score); })
+          .attr('height', props.barHeight - 2)
+          .on('click', function (d, i) {
+            d3.event.stopPropagation();
+            var next = state.filter(function (elem, i) { return elem.title == d.title; });
+            if (next[0].down != []) {
+              courseChart.update(el, props, next[0].down);
+            } else {
+              console.log("You reached the bottom.");
+            }
+
+          });
+
+        enterBar.append('text')
+          .text(function (d) { return d.title; })
+          // .attr('text-anchor', 'end')
+          .attr('x', function (d) { return 2; })
+          .attr('y', props.barHeight / 2)
+          .attr('dy', "0.35em")
+          .each(wrap());
+      }
+
+      courseChart.destroy = function (el) {
+
+      }
+
+      // http://stackoverflow.com/questions/15975440/add-ellipses-to-overflowing-text-in-svg
+      function wrap(width, padding) {
+        return function () {
+          var self = d3.select(this);
+          var textLength = self.node().getComputedTextLength();
+          var text = self.text();
+          // console.log(textLength, text);
+        }
+      }
+    </script>
+
+    <!-- React JS  -->
+    <script type="text/babel">
+
+      var MenuItems = React.createClass({
+        getInitialState: function () {
+          return { selected: 'overview' }
+        },
+        setView: function (view) {
+          this.setState({ selected: view });
+          this.props.onChangeView(view);
+        },
+        isActive: function (value) {
+          var cls = 'item ' + value + ((value == this.state.selected) ? ' active' : '');
+          return cls;
+        },
+        render: function () {
+          var divStyle = {
+            borderBottom: '2px solid rgba(34,36,38,.15)'
+          };
+          return (
+            <div className="ui secondary pointing menu" style={divStyle}>
+              <div className={this.isActive('overview')} onClick={this.setView.bind(this, 'overview')}>Overview</div>
+              <div className={this.isActive('schedule')} onClick={this.setView.bind(this, 'schedule')}>Schedule</div>
+              <div className={this.isActive('course')} onClick={this.setView.bind(this, 'course')}>Course</div>
+              {/* <div className={this.isActive('students')} onClick={this.setView.bind(this, 'students')}>Students</div> */}
+            </div>
+          )
+        }
+      });
+
+      var OverviewPage = React.createClass({
+        getInitialState: function () {
+          return {};
+        },
+        render: function () {
+          var style1 = {
+            fontSize: "1.3em",
+            fontWeight: "700"
+          };
+
+          var style2 = {
+            paddingLeft: '1em'
+          };
+
+          return (
+            <div className="overview tab">
+              <div className="ui items">
+                <div className="item">
+                  <div className="image"><img src="http://www.placehold.it/150x150" /></div>
+                  <div className="content">
+                    {/* Header */}
+                    <div><a href="#" className="header" style={style1}>{this.props.course.title}</a></div>
+                    <div className="meta"><span>{this.props.course.description}</span></div>
+                    <div className="description">
+                      <p><strong>Instructor:</strong> {this.props.course.author} at {this.props.course.affiliation}</p>
+                    </div>
+                    {/* <div className="extra" style={style2}>
+                      <a className="ui tag label">{{overview.topics}}</a>
+                    </div> */}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        }
+      });
+
+      var SchedulePage = React.createClass({
+        getInitialState: function () {
+          return {};
+        },
+        render: function () {
+          var list = [];
+
+          console.log(this.props.schedule[0]);
+
+          this.props.schedule.forEach(function (elem, idx) {
+            var date = moment(elem.when).format('DD-MM-YYYY');
+            list.push(<li key={idx}>{elem.type} at {date}</li>);
+          });
+
+          return (
+            <div>
+              <ul className="scheduleList">
+                {list}
+              </ul>
+            </div>
+          )
+        }
+      });
+
+      var CoursePage = React.createClass({
+        getInitialState: function () {
+          return {
+            chartProps: {
+              width: 400,
+              height: 225,
+              barHeight: 30,
+              margin: {
+                top: 15,
+                right: 15,
+                bottom: 15,
+                left: 15
+              }
+            },
+            chartData: [
+              { title: "Quiz 1", type: "Qui", score: 83, correct: false, down: [
+                { title: "Question 1", type: "Que", score: 50, correct: false, down: [
+                  { title: "Response 1", type: "Res", score: 30, correct: false },
+                  { title: "Response 2", type: "Res", score: 50, correct: false },
+                  { title: "Response 3", type: "Res", score: 20, correct: false },
+                  { title: "Response 4", type: "Res", score: 10, correct: false },
+                  { title: "Response 5", type: "Res", score: 40, correct: true }
+                ]},
+                { title: "Question 2", type: "Que", score: 40, correct: false },
+                { title: "Question 3", type: "Que", score: 10, correct: false },
+                { title: "Question 4", type: "Que", score: 30, correct: false }
+              ]},
+              { title: "Quiz 2", type: "Qui", score: 34, correct: false },
+              { title: "Quiz 3", type: "Qui", score: 71, correct: false }
+            ]
+          };
+        },
+        componentDidMount: function () {
+          var el = '.analytics4';
+          courseChart.create(el, this.state.chartProps, this.state.chartData);
+        },
+        componentDidUpdate: function () {
+          var el = '.analytics4';
+          courseChart.update(el, this.state.chartProps, this.state.chartData);
+        },
+        componentWillUnmount: function () {
+          var el = '.analytics4';
+          courseChart.destroy(el);
+        },
+        reset: function () {
+          this.setState(this.state);
+        },
+        render: function () {
+          return (
+            <div className="course tab">
+              <div className="controls">
+                <button className="ui tiny button" onClick={this.reset}>Reset</button><br />
+                <button className="ui tiny button">Sort</button>
+              </div>
+              <div className="analytics4"></div>
+            </div>
+          )
+        }
+      });
+
+      var StudentsPage = React.createClass({
+        getInitialState: function () {
+          return {};
+        },
+        render: function () {
+          return (
+            <div>
+              Students
+            </div>
+          )
+        }
+      });
+
+      var Page = React.createClass({
+        getInitialState: function () {
+          return {
+            view: '',
+            course: {},
+            schedule: {}
+          };
+        },
+        componentDidMount: function () {
+          var coursePromise = axios.get('/api/course/' + {{data}});
+          var schedulePromise = axios.get('/api/course/' + {{data}} + '/schedule');
+
+          Promise.all([coursePromise, schedulePromise])
+          .then(function (resp) {
+            this.setState({
+              course: resp[0].data,
+              schedule: resp[1].data
+            });
+          }.bind(this))
+          .catch(function (err) {
+            console.log(err);
+          });
+        },
+        changeView: function (view) {
+          this.setState({ view: view });
+        },
+        render: function () {
+          var page = 1;
+
+          switch (this.state.view) {
+            case 'overview':
+              page = 1;
+              break;
+            case 'schedule':
+              page = 2;
+              break;
+            case 'course':
+              page = 3;
+              break;
+            // case 'students':
+            //   page = 4;
+            //   break;
+            default:
+              page = 1;
+              break;
+          };
+
+          return (
+            <div>
+              <MenuItems onChangeView={this.changeView}></MenuItems>
+              {page === 1 ? (<OverviewPage course={this.state.course}></OverviewPage>) : null}
+              {page === 2 ? (<SchedulePage schedule={this.state.schedule}></SchedulePage>) : null}
+              {page === 3 ? (<CoursePage></CoursePage>) : null}
+              {/* {page === 4 ? (<StudentsPage></StudentsPage>) : null} */}
+            </div>
+          )
+
+        }
+      })
+
+      ReactDOM.render(
+        <Page source="/api/course/{{data}}"/>, // This is also JSX.
+        document.getElementById('page_container')
+      );
+    </script>
 
     <!-- General Script -->
-    <script>
+    <!-- <script>
     $(function () {
       tick(course);
 
@@ -340,12 +726,12 @@
 
     });
 
-    </script>
+    </script> -->
 
-    <!-- D3.js Script -->
-    <script>
+    <!-- Old D3.js Script -->
+
+    <!-- <script>
       var page_data = [];
-
 
       $('.blue.button').on('click', function (e) {
         e.preventDefault();
@@ -481,19 +867,10 @@
       //   tick(data5)
       // }, 1500);
 
-      // http://stackoverflow.com/questions/15975440/add-ellipses-to-overflowing-text-in-svg
-      function wrap(width, padding) {
-        return function () {
-          var self = d3.select(this);
-          var textLength = self.node().getComputedTextLength();
-          var text = self.text();
-          // console.log(textLength, text);
-
-        }
-      }
 
 
-    </script>
+
+    </script> -->
 
     <!-- <script>
 

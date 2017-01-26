@@ -31,7 +31,7 @@ router.get('/account', allowAbove1, function (req, res) {
 });
 
 router.get('/course/:id', allowAbove1, function (req, res) {
-  res.render('course');
+  res.render('course', {'data': req.params.id});
 });
 
 router.get('/quiz/:id', allowAbove1, function (req, res) {

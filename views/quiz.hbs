@@ -179,7 +179,7 @@
     <!-- Main React Script  -->
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
-    <script type="text/babel">
+    <!-- <script type="text/babel">
       var QuizContainer = React.createClass({
         getInitialState: function () {
           return {
@@ -248,7 +248,7 @@
       });
 
 
-    </script>
+    </script> -->
 
 
     <script type="text/babel">
@@ -283,12 +283,14 @@
           // If we are answering a question - save the response.
           var prePhaseType = categorizePhase(this.state.phase, this.state.lastPhase);
           var questionNumber = Math.ceil(this.state.phase / 2) - 1;
+
           if (prePhaseType == 3) {
             this.state.answerData.push({
               quiz_id: this.state.quizData.quiz.id,
               question_id: $('.questionID')[0].innerHTML,
               response_id: $('.selected .responseID')[0].innerHTML,
-              correct_id: this.state.quizData.questions[questionNumber].filter(function(res) { return res.correct; })[0].correctID
+              correct_id: 0 // this.state.quizData.questions[questionNumber].filter(function(res) { return res.correct; })[0].correctID
+              // TODO: How (or why?!?) pass correct ID for answer data?
             });
           }
           // Update the phase.
@@ -324,7 +326,7 @@
 
             this.setState({
               quizData: quizData2,
-              lastPhase: 10,
+              lastPhase: 2 + (resp[1].data.length * 2),
               analytics: {
                 questions: resp[2].data,
                 quiz: {}
@@ -501,7 +503,7 @@
 
           var rows = [];
           this.props.question.forEach(function (response, index) {
-            rows.push(<ResponseLine key={index} response={response.responseText} idnum={response.id}></ResponseLine>)
+            rows.push(<ResponseLine key={index} response={response.response} idnum={response.id}></ResponseLine>)
           });
 
           return (
@@ -559,7 +561,7 @@
             }
             if (response.id == self.props.ans.response_id) { var chosenAns = true; } else { var chosenAns = false; }
             if (response.id == self.props.ans.correct_id) { var correctAns = true; }
-            rows.push(<AnalyticsLine key={index} response={response.responseText} chosen={chosenAns} correct={correctAns} nums={stat}></AnalyticsLine>);
+            rows.push(<AnalyticsLine key={index} response={response.response} chosen={chosenAns} correct={correctAns} nums={stat}></AnalyticsLine>);
           });
 
           return (

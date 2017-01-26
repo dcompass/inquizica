@@ -175,7 +175,7 @@
         <div class="column">
           <div id="main"></div>
 
-
+          <script>/*
           <div class="ui white segment">
             <div class="ui cards">
             <!-- {{#each courses}}
@@ -275,8 +275,10 @@
             </div>
 
           </div>
+          */</script>
         </div>
       </div>
+
 
     </div>
 
@@ -291,8 +293,7 @@
           }
         },
         componentDidMount: function () {
-          var user_url = '/api/user/' + {{ user.id }};
-          var prom1 = axios.get(user_url);
+          var prom1 = axios.get('/api/user/' + {{ user.id }});
           var course_url = '/api/user/' + {{ user.id }} + '/courses';
           var prom2 = axios.get(course_url);
           var self = this;
@@ -313,13 +314,22 @@
             classes.push(<Course id={course.id} title={course.title} key={index}></Course>);
           });
 
+          var typeName = [ 'Guest', 'Student', 'Teacher', 'Admin' ];
+          var userType = typeName[this.state.user.type];
+
+          if (typeof this.state.user.phone != 'undefined') {
+            var userPhone = this.state.user.phone;
+            userPhone = userPhone.slice(0, 3) + '-' + userPhone.slice(3, 6) + '-' + userPhone.slice(6);
+          }
+
           return (
             <div className="ui white segment">
               <h1 className="ui header">{this.state.user.firstname} {this.state.user.lastname}
                 <div className="sub header">
-                  {this.state.user.type} | {this.state.user.affiliation} | {this.state.user.phone}
+                  {userType} | {this.state.user.affiliation} | {userPhone}
                 </div>
               </h1>
+              <h4>Current Courses:</h4>
               {classes}
             </div>
 
