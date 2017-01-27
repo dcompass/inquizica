@@ -7,10 +7,14 @@ function Users() {
 // TODO: Reject bad user_objects.
 function create(user_obj) {
   if (user_obj.hasOwnProperty('phone')) {
-    return Users().insert(user_obj);
-  } else {
-    return Promise.reject("Could not create new user.");
-  }
+    return Users().insert(user_obj)
+    .then(function (data) {
+      return Users().select('id').where({phone: user_obj.phone})
+      .then(function (user_id) {
+        return Promise.resolve(user_id);
+      }).catch(function (err) { return Promise.reject("Could not create new user."); });
+    }).catch(function (err) { return Promise.reject("Could not create new user."); });
+  } else { return Promise.reject("Could not create new user."); }
 }
 
 function read(user_id) {

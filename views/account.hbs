@@ -313,13 +313,15 @@
           this.state.courses.forEach(function (course, index) {
             classes.push(<Course id={course.id} title={course.title} key={index}></Course>);
           });
+          if (classes.length == 0) { classes = (<a href='/scheduler'>Create One Today</a>)};
 
           var typeName = [ 'Guest', 'Student', 'Teacher', 'Admin' ];
           var userType = typeName[this.state.user.type];
 
+          var userPhone = "";
           if (typeof this.state.user.phone != 'undefined') {
-            var userPhone = this.state.user.phone;
-            userPhone = userPhone.slice(0, 3) + '-' + userPhone.slice(3, 6) + '-' + userPhone.slice(6);
+            userPhone = this.state.user.phone;
+            if (userPhone.indexOf('-') == -1) { userPhone = userPhone.slice(0, 3) + '-' + userPhone.slice(3, 6) + '-' + userPhone.slice(6); }
           }
 
           return (

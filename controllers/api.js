@@ -80,14 +80,21 @@ router.post('/demo/promo', jsonParser, function (req, res, next) {
  * POST /user
  */
 router.post('/user/', jsonParser, function (req, res, next) {
-  User.newUser(req.body)
-    .then(function (data) {
-      res.set('Location', '/account');
-      res.status(303).end();
+  var course_code = req.body.code;
+  delete req.body.code;
+  User.newUser(req.body).then(function (data) {
+      // TODO: Join course if desired.
+
+      // Create user.
+      var usr = { "id": data[0].id, "name": req.body.firstname, "type": req.body.type };
+      // Login
+      req.login(usr, function (err) {
+        res.status(200).json({"redirect_url": "/account"});
+      });
     })
     .catch(function (err) {
-      // logger.log('error', 'Could not create user.');
-      res.set('Location', '/signup');
+      logger.log('error', err);
+      // res.set('Location', '/signup');
       res.status(400).end();
     });
 });
@@ -172,7 +179,7 @@ router.get('/user/:id/courses', function (req, res, next) {
   User.getCourses(req.params.id)
     .then(function (data) {
       if (data.length == 0) {
-        res.status(404).json([]);
+        res.status(200).json([]);
       } else {
         // var results = data.map(function (elem) { return elem.course_id; });
         res.status(200).json(data);
@@ -183,9 +190,15 @@ router.get('/user/:id/courses', function (req, res, next) {
     });
 });
 
+// router.get('/user/')
+
 // =================================================
 
+// Should also add user to this new course.
 router.post('/course', jsonParser, function (req, res, next) {
+  // TODO: Remove this.
+  res.status(200).json({"redirect_url": "/account"});
+
   Course.newCourse(req.body)
     .then(function (data) {
       res.set('location', '/');
@@ -195,6 +208,17 @@ router.post('/course', jsonParser, function (req, res, next) {
       res.set('location', '/');
       res.status(400).end();
     });
+});
+
+// TODO: remove this.
+router.get('/course/topics', function (req, res, next) {
+  res.status(200).json([
+    { id: 1, title: "HIPAA Protocols"},
+    { id: 2, title: "Central Nervous System"},
+    { id: 3, title: "Calculus"},
+    { id: 4, title: "Javascript"},
+    { id: 5, title: "Civic Duties"},
+  ]);
 });
 
 router.get('/course/:id', function (req, res, next) {

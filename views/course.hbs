@@ -501,7 +501,7 @@
             <div className="overview tab">
               <div className="ui items">
                 <div className="item">
-                  <div className="image"><img src="http://www.placehold.it/150x150" /></div>
+                  <div className="image"><img height="100" width="100" src="/public/img/biology_demo.png" /></div>
                   <div className="content">
                     {/* Header */}
                     <div><a href="#" className="header" style={style1}>{this.props.course.title}</a></div>
@@ -530,8 +530,8 @@
           console.log(this.props.schedule[0]);
 
           this.props.schedule.forEach(function (elem, idx) {
-            var date = moment(elem.when).format('DD-MM-YYYY');
-            list.push(<li key={idx}>{elem.type} at {date}</li>);
+            var date = moment(elem.when).format('h:mm a, MMM Mo, ');
+            list.push(<li key={idx}>{date} -~- {elem.type}</li>);
           });
 
           return (

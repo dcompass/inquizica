@@ -457,10 +457,10 @@
 
 
 
-    <script type="text/babel">
+    <!-- <script type="text/babel">
       // To get started with this tutorial running your own code, simply remove
       // the script tag loading scripts/example.js and start writing code here.
-    </script>
+    </script> -->
 
     <!-- Main JS -->
     <script>
@@ -528,6 +528,7 @@
           var date;
           var tops;
           $('.topics').html('');
+          $('.topics').append("<h3>Topic Dates</h3>");
           $('.topic_table tr').each(function (row_index) {
             $(this).find('td').each(function (index) {
               if (index == 0) {
@@ -543,6 +544,7 @@
           // Show Exam Info
           var exams = [];
           $('.exams').html('');
+          $('.exams').append("<h3>Exam Dates</h3>");
           $('.exam_table tr').each(function (row_index) {
             $(this).find('td').each(function (index) {
               if (index == 1) {
@@ -608,14 +610,14 @@
               datePicker2
             }
           }
-          $.post('/scheduler', pack, function (data) {
+          $.post('/api/course', pack, function (data) {
             console.log("P", data);
             cb(null, data);
           });
         }
 
         var getTopics = function (cb) {
-          $.get('/scheduler/topics', function (data) {
+          $.get('/api/course/topics', function (data) {
             cb(null, data);
           });
         }
@@ -655,7 +657,7 @@
         $('.finish').on('click', function (e) {
           e.preventDefault();
           submitCourse(function (err, data) {
-            window.location = data.data;
+            window.location = data.redirect_url;
             // console.log("B", err, data);
           });
         });

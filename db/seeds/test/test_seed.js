@@ -19,7 +19,8 @@ exports.seed = function(knex, Promise) {
     knex('user').del(),
     knex('course').del(),
     knex('quiz').del(),
-    knex('question').del()
+    knex('question').del(),
+    knex('course_schedule').del()
   ]).then(function () {
     var data = [
       // Users
@@ -499,14 +500,32 @@ exports.seed = function(knex, Promise) {
       function () {
         return knex('course_schedule').insert({
         course_id: 1,
-        when: this_time,
-        type: "start"
+        when: c_q_time_1,
+        type: "Class Begins"
       })},
       function () {
         return knex('course_schedule').insert({
         course_id: 1,
-        when: next_time,
-        type: "end"
+        when: c_q_time_2,
+        type: "Quiz #1"
+      })},
+      function () {
+        return knex('course_schedule').insert({
+        course_id: 1,
+        when: c_q_time_3,
+        type: "Quiz #2"
+      })},
+      function () {
+        return knex('course_schedule').insert({
+        course_id: 1,
+        when: c_q_time_4,
+        type: "Quiz #3"
+      })},
+      function () {
+        return knex('course_schedule').insert({
+        course_id: 1,
+        when: c_q_time_5,
+        type: "Class Ends"
       })}
 
     ];
