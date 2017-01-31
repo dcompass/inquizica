@@ -1,19 +1,29 @@
+// This module/API is an express rotuer.
 var express = require('express');
 var router = express.Router();
 
+// Load useful modules.
 var passport = require('passport');
-
 var logger = require('../middleware/logs.js');
+var papa = require('babyparse');
+var fs = require('fs');
 
+// Load parsing middleware mostly for form data.
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
+var multer = require('multer');
+var upload = multer({ dest: __dirname + '/../uploads/' });
 
+// Load database models.
 var User = require('../db/models/user');
 var Course = require('../db/models/course');
 var Quiz = require('../db/models/quiz');
 var Question = require('../db/models/question');
 var Qm = require('../db/models/qm');
 
+// ==============|
+// Authorization |
+// ==============|
 
 router.post('/auth/login', jsonParser, passport.authenticate('local', {failureRedirect: '/login'}), function (req, res, next) {
   if (typeof req.user != "undefined") {
@@ -35,7 +45,9 @@ router.get('/auth/logout', function (req, res, next) {
   res.status(303).end();
 });
 
-// =================================================
+// ===============|
+// Demonstrations |
+// ===============|
 
 router.post('/demo/promo', jsonParser, function (req, res, next) {
   res.set("Content-Type", "application/json");
@@ -74,7 +86,32 @@ router.post('/demo/promo', jsonParser, function (req, res, next) {
   };
 });
 
-// =================================================
+router.post('/admin', upload.single('spreadsheet'), function (req, res, next) {
+  if (req.file.mimetype != 'text/csv') { console.log('wrong type'); }
+  else { console.log(req.file); }
+  // res.status(200).json({'redirect_url': '/admin'});
+
+  var fileContent = fs.readFileSync(req.file.path, { encoding: 'utf8' });
+  papa.parse(fileContent, {
+    delimiter: ",",
+    newline: "\r\n",
+    complete: function (results) {
+      makeQuiz(results.data, function (err) {
+        res.status(200).json({'redirect_url': '/admin'});
+      });
+    }
+  });
+
+  function makeQuiz (csvArray, cb) {
+    var quizTitle = csvArray[10][1];
+    console.log(quizTitle);
+    cb(null);
+  }
+});
+
+// ===========|
+// User Model |
+// ===========|
 
 /**
  * POST /user
@@ -93,7 +130,7 @@ router.post('/user/', jsonParser, function (req, res, next) {
       });
     })
     .catch(function (err) {
-      logger.log('error', err);
+      // logger.log('error', err);
       // res.set('Location', '/signup');
       res.status(400).end();
     });
@@ -192,17 +229,19 @@ router.get('/user/:id/courses', function (req, res, next) {
 
 // router.get('/user/')
 
-// =================================================
+// =============|
+// Course Model |
+// =============|
 
 // Should also add user to this new course.
 router.post('/course', jsonParser, function (req, res, next) {
   // TODO: Remove this.
-  res.status(200).json({"redirect_url": "/account"});
+  // res.status(200).json({"redirect_url": "/account"});
 
   Course.newCourse(req.body)
     .then(function (data) {
       res.set('location', '/');
-      res.status(301).end();
+      res.status(200).end();
     })
     .catch(function (err) {
       res.set('location', '/');
@@ -334,7 +373,9 @@ router.put('/course/:id/quiz', function (req, res, next) {
     }).catch(function (err) { console.log("B", err); res.status(501).end(); });
 });
 
-// =================================================
+// ===========|
+// Quiz Model |
+// ===========|
 
 router.post('/quiz/', jsonParser, function (req, res, next) {
   Quiz.newQuiz(req.body)
@@ -443,7 +484,9 @@ router.post('/quiz/:id/record', jsonParser, function (req, res, next) {
   res.status(501).end();
 });
 
-// =================================================
+// ===============|
+// Question Model |
+// ===============|
 
 router.post('/question/', function (req, res, next) {
   res.status(500).end("No");

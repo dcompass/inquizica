@@ -54,6 +54,10 @@ function addQuestion(quiz_id, question_id, index) {
   });
 }
 
+function parseCSV(csvArray) {
+  
+}
+
 
 
 module.exports = {

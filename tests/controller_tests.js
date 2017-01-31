@@ -36,7 +36,7 @@ describe('API Controller:', function () {
   });
 
   describe('User', function () {
-    it("[POST /user] should issue [303 SEE OTHER] redirect on success", function (done) {
+    it("[POST /user] should issue [200 OKAY] redirect on success", function (done) {
       var user = {
         firstname: "Sean",
         lastname: "Lynch",
@@ -49,10 +49,10 @@ describe('API Controller:', function () {
       request(app)
         .post('/api/user')
         .send(user)
-        .expect(303)
+        .expect(200)
         .end(function (err, res) {
           if (err) return done(err);
-          expect(res.header['location']).equals('/account');
+          // expect(res.header['location']).equals('/account');
           done();
         });
     });
@@ -72,7 +72,7 @@ describe('API Controller:', function () {
         .expect(400)
         .end(function (err, res) {
           if (err) return done(err);
-          expect(res.header['location']).equals('/signup');
+          // expect(res.header['location']).equals('/signup');
           done();
         });
     });
@@ -173,10 +173,10 @@ describe('API Controller:', function () {
           done();
         });
     });
-    it("[GET /user/:id/courses] should issue [404 NOT FOUND] with json when user does not exist", function (done) {
+    it("[GET /user/:id/courses] should issue [200 OKAY] with empty json when user does not exist", function (done) {
       request(app)
         .get('/api/user/818181/courses')
-        .expect(404)
+        .expect(200)
         .end(function (err, res) {
           if (err) return done(err);
           expect(res.body).to.be.json;
@@ -240,7 +240,7 @@ describe('API Controller:', function () {
 
   describe("Course", function () {
     // TODO: should return new course id on success too (and redirect there...).
-    it('[POST /course] should issue [301 REDIRECT] on success', function (done) {
+    it('[POST /course] should issue [200 OKAY] on success', function (done) {
       var course_data = {
         title: "Physiology",
         description: "Medical school level course",
@@ -250,13 +250,13 @@ describe('API Controller:', function () {
       request(app)
         .post('/api/course')
         .send(course_data)
-        .expect(301)
+        .expect(200)
         .end(function (err, res) {
           if (err) return done(err);
           done();
         });
     });
-    it('[POST /course] should issue [400 BAD REQ] on incomplete form data', function (done) {
+    it('[POST /course] should issue [200 OKAY] on incomplete form data', function (done) {
       var course_data = {
         // title missing
         description: "Medical school level course",
@@ -568,6 +568,29 @@ describe('API Controller:', function () {
     // });
   });
 
+  describe("Admin", function () {
+    it('[POST /admin] should issue [200 OKAY] if quiz created successfully', function (done) {
+      request(app)
+        .post('/admin')
+        .send({})
+        .expect(200)
+        .end(function (err) {
+          if (err) return done(err);
+          done();
+        });
+    });
+    it('[POST /admin] should issue [400 BAD REQ] if quiz was missing info', function (done) {
+      request(app)
+        .post('/admin')
+        .send({})
+        .expect(400)
+        .end(function (err) {
+          if (err) return done(err);
+          done();
+        });
+    });
+  });
+
   describe("Demo", function () {
     it('[POST /demo/promo] should issue [200 OKAY] if it contains a valid quiz id and phone number', function (done) {
       request(app)
@@ -601,102 +624,6 @@ describe('API Controller:', function () {
     });
     // it should get/send json
   });
-
-  // describe('Quiz', function () {
-
-  //   it("should UPDATE a given quiz", function (done) {
-  //     request(app)
-  //       .put('/quiz/3')
-  //       .expect(200)
-  //       .end(function (err, res) {
-  //         if (err) return done(err);
-  //         done();
-  //       });
-  //   });
-  //   it("should READ the analytics of a given quiz");
-  //   it("should READ the questions of a given quiz");
-  //   it("should ADD a question to a given quiz");
-  //   it("should CREATE a new quiz record");
-  // });
-
-  // describe('Question', function () {
-  //   it("should CREATE a new question", function (done) {
-  //     request(app)
-  //       .post('/question')
-  //       .expect(200)
-  //       .end(function (err, res) {
-  //         if (err) return done(err);
-  //         done();
-  //       });
-  //   });
-  //   it("should READ a given question", function (done) {
-  //     request(app)
-  //       .get('/question/4')
-  //       .expect(200)
-  //       .end(function (err, res) {
-  //         if (err) return done(err);
-  //         done();
-  //       });
-  //   });
-  //   it("should UPDATE a given question", function (done) {
-  //     request(app)
-  //       .put('/question/4')
-  //       .expect(200)
-  //       .end(function (err, res) {
-  //         if (err) return done(err);
-  //         done();
-  //       });
-  //   });
-  //   it("should DESTROY a given question", function (done) {
-  //     request(app)
-  //       .delete('/question/4')
-  //       .expect(200)
-  //       .end(function (err, res) {
-  //         if (err) return done(err);
-  //         done();
-  //       });
-  //   });
-  //   it("should READ responses for a given question");
-  // });
-
-  // describe('Response', function () {
-  //   it("should CREATE a new response", function (done) {
-  //     request(app)
-  //       .post('/response')
-  //       .expect(200)
-  //       .end(function (err, res) {
-  //         if (err) return done(err);
-  //         done();
-  //       });
-  //   });
-  //   it("should READ a given response", function (done) {
-  //     request(app)
-  //       .get('/response/5')
-  //       .expect(200)
-  //       .end(function (err, res) {
-  //         if (err) return done(err);
-  //         done();
-  //       });
-  //   });
-  //   it("should UPDATE a given response", function (done) {
-  //     request(app)
-  //       .put('/response/5')
-  //       .expect(200)
-  //       .end(function (err, res) {
-  //         if (err) return done(err);
-  //         done();
-  //       });
-  //   });
-  //   it("should DESTROY a given response", function (done) {
-  //     request(app)
-  //       .delete('/response/5')
-  //       .expect(200)
-  //       .end(function (err, res) {
-  //         if (err) return done(err);
-  //         done();
-  //       });
-  //   });
-  // });
 
 });
 

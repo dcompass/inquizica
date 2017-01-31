@@ -12,9 +12,9 @@ function create(user_obj) {
       return Users().select('id').where({phone: user_obj.phone})
       .then(function (user_id) {
         return Promise.resolve(user_id);
-      }).catch(function (err) { return Promise.reject("Could not create new user."); });
-    }).catch(function (err) { return Promise.reject("Could not create new user."); });
-  } else { return Promise.reject("Could not create new user."); }
+      }).catch(function (err) { return Promise.reject("1Could not create new user."); });
+    }).catch(function (err) { return Promise.reject("2Could not create new user."); });
+  } else { return Promise.reject("3Could not create new user."); }
 }
 
 function read(user_id) {

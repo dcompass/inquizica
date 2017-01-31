@@ -1,5 +1,6 @@
 <html>
 <head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   <style>
     table {
       border-collapse: collapse;
@@ -13,8 +14,8 @@
 <body>
 
 <div>
-  <form method='post' action='admin' enctype="multipart/form-data">
-  <input type='file' name='spreadsheet'>
+  <form class="myForm" enctype="multipart/form-data">
+  <input class="fileInput" type='file' name='spreadsheet'>
   <br />
   <input type='submit' value="Upload">
 </div>
@@ -36,7 +37,32 @@
   </table>
 </div>
 
+<script>
+$(function () {
+  $('.myForm').on('submit', function (e) {
+    e.preventDefault();
+    var file = $('.fileInput')[0].files[0];
+    var formData = new FormData();
+    formData.append('spreadsheet', file);
 
+    $.ajax({
+      url: '/api/admin',
+      type: 'POST',
+      success: function (res) {
+        console.log(res);
+        window.location.href = res.redirect_url;
+      },
+      error: function (err) {
+        console.log(err);
+      },
+      data: formData,
+      processData: false,
+      contentType: false
+    });
+  });
+});
+
+</script>
 
 </body>
 </html>

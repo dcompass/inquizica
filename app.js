@@ -1,21 +1,24 @@
+// Load Environment Variables
 require('dotenv').config();
 
+// Load server
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
+
+// Load database
 var knex_db = require(__dirname + '/db/knex.js');
 
-// Start Logging
+// Start logging
 process.stdout.write('\u001B[2J\u001B[0;0f');
 var logger = require(__dirname + '/middleware/logs.js');
 logger.log('info', "Starting Logger...");
-
 if (process.env.NODE_ENV != "test") {
   var morgan = require('morgan');
   app.use(morgan('dev'));
 }
 
-// Views & Public
+// Setup views & public resources.
 var hbs = require('hbs');
 app.set('view engine', 'hbs');
 app.set('views', './views');
@@ -27,12 +30,12 @@ app.use("/public", express.static(__dirname + '/public'));
 // Auth & Session Libraries |
 // ==========================
 
-// Passport and strategies.
+// Import Passport and strategies.
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var URLStrategy = require(__dirname + '/middleware/urlStrategy'); // TODO: Include this.
 
-// Sessions and such.
+// Setup MySQL sessions and such.
 var mysql = require('mysql');
 var session = require('express-session');
 var MySQLStore = require('express-mysql-session')(session);
@@ -42,12 +45,10 @@ var connection = mysql.createConnection({
   password: process.env.PASS,
   database: process.env.DATABASE
 });
-connection.connect(function (err) {
-  if (err) console.log(err);
-});
+connection.connect(function (err) { if (err) console.log(err) });
 var sessionStore = new MySQLStore({}, connection);
 
-
+// Local strategy for authentication.
 passport.use(new LocalStrategy({
   usernameField: 'email',
   passwordField: 'passwd'
@@ -67,7 +68,7 @@ passport.use(new LocalStrategy({
   });
 }));
 
-// Store the users ID number (or more) in the session.
+// Executed when user is autheniticated. Defines user cookie.
 passport.serializeUser(function (user, done) {
   var serialUser = {
     "id": user.id || user.User_id,
@@ -78,7 +79,7 @@ passport.serializeUser(function (user, done) {
 });
 
 // Receives whatever object was stored when serializing.
-// Could use this ID number and look up more info about user if needed.
+// Could use this ID number and look up more info about user if needed (server-side).
 // Saved in req.user
 passport.deserializeUser(function (user, done) {
   done(null, user);
@@ -106,8 +107,7 @@ app.use(passport.session());
 app.use('/api', require('./controllers/api'));
 app.use('/', require('./controllers/views'));
 
-// Miscallaneous routes.
-
+// Internal server error route.
 app.use(function(err, req, res, next) {
   console.error("~Error Handler~\n", err.stack);
   res.status(500).render("404");
@@ -115,6 +115,7 @@ app.use(function(err, req, res, next) {
   // next();
 });
 
+// Page not found route.
 app.use(function (req, res, next) {
   res.status(404).render("404");
   // res.status(404).send("404 - Page Not Found. Sorry, this is probably our fault. Thanks for your patience while we are still in our beta phase :)");
@@ -126,11 +127,12 @@ app.use(function (req, res, next) {
 // Startup and closeout |
 // ======================
 
+// Start listening, ready to go.
 http.listen(process.env.PORT, function() {
   logger.log('info', 'Server Listening...');
 });
 
-// Exiting gracefully.
+// Cleanup function, for exiting gracefully.
 process.on('SIGINT', function () {
   logger.log('info', "Shutting down...");
   connection.end();
@@ -138,5 +140,5 @@ process.on('SIGINT', function () {
   process.exit();
 });
 
-// For testing.
+// Export express app for testing.
 module.exports = app;
