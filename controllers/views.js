@@ -52,6 +52,10 @@ router.get('/admin', allowAbove3, function (req, res) {
   res.render('admin');
 });
 
+router.get('/quiz-maker', allowAbove3, function (req, res) {
+  res.render('quizMaker');
+});
+
 
 // Utilities
 
